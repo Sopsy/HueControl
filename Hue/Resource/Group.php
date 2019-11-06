@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Hue;
+namespace Hue\Resource;
+
+use Hue\Group\LightGroup;
+use Hue\Group\SceneGroup;
+use Hue\Resource\Scene;
 
 final class Group
 {
@@ -22,9 +26,9 @@ final class Group
         $this->scenes = $scenes;
     }
 
-    public function id(): string
+    public function id(): int
     {
-        return $this->name;
+        return $this->id;
     }
 
     public function name(): string
@@ -32,13 +36,18 @@ final class Group
         return $this->name;
     }
 
-    public function lights(): LightGroup
+    public function lights(): array
     {
-        return $this->lights;
+        return $this->lights->lights();
     }
 
-    public function scenes(): SceneGroup
+    public function scenes(): array
     {
-        return $this->scenes;
+        return $this->scenes->scenes();
+    }
+
+    public function findScene(string $name): Scene
+    {
+        return $this->scenes->findByName($name);
     }
 }

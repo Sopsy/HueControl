@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Hue;
+namespace Hue\Resource;
 
 final class Light
 {

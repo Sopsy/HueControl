@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Hue;
+namespace Hue\Group;
 
-final class LightGroup extends AbstractGroup
+use Hue\Resource\Light;
+
+final class LightGroup
 {
+    private $items;
+
     public function __construct(Light ...$lights)
     {
         $this->items = $lights;
