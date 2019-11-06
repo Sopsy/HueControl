@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Hue\Group;
 
+use Hue\Contract\GroupInterface;
+use Hue\Contract\ResourceInterface;
 use Hue\Resource\ResourceLinks;
 use RuntimeException;
 
-final class ResourceLinksGroup
+final class ResourceLinksGroup implements GroupInterface
 {
     private $items;
 
@@ -15,12 +17,15 @@ final class ResourceLinksGroup
         $this->items = $items;
     }
 
-    public function resourceLinks(): array
+    /**
+     * @return ResourceInterface[]
+     */
+    public function all(): array
     {
         return $this->items;
     }
 
-    public function resourceLinksByName(string $name): ResourceLinks
+    public function byName($name): ResourceInterface
     {
         foreach ($this->items AS $item) {
             if ($item->name() === $name) {

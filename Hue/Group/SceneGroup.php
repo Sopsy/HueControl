@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Hue\Group;
 
+use Hue\Contract\GroupInterface;
+use Hue\Contract\ResourceInterface;
 use Hue\Resource\Scene;
 use RuntimeException;
 
-final class SceneGroup
+final class SceneGroup implements GroupInterface
 {
     private $items;
 
@@ -15,12 +17,12 @@ final class SceneGroup
         $this->items = $scenes;
     }
 
-    public function scenes(): array
+    public function all(): array
     {
         return $this->items;
     }
 
-    public function findByName(string $name): Scene
+    public function byName($name): ResourceInterface
     {
         foreach ($this->items as $item) {
             if ($item->name() === $name) {

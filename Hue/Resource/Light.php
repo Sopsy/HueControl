@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-final class Light
+use Hue\Contract\ResourceInterface;
+
+final class Light implements ResourceInterface
 {
     private $id;
     private $name;
@@ -14,5 +16,20 @@ final class Light
         $this->id = $id;
         $this->name = $name;
         $this->type = $type;
+    }
+
+    public function id(): int
+    {
+        return $this->id;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function type(): string
+    {
+        return $this->type;
     }
 }

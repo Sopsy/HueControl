@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-final class Scene
+use Hue\Contract\ResourceInterface;
+
+final class Scene implements ResourceInterface
 {
     private $id;
     private $name;
+    private $type;
 
     public function __construct(string $id, string $name, string $type)
     {
         $this->id = $id;
         $this->name = $name;
+        $this->type = $type;
     }
 
     public function id(): string
@@ -22,5 +26,10 @@ final class Scene
     public function name(): string
     {
         return $this->name;
+    }
+
+    public function type(): string
+    {
+        return $this->type;
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hue;
 
+use Hue\Group\GroupGroup;
 use Hue\Group\LightGroup;
 use Hue\Group\ResourceLinksGroup;
 use Hue\Group\SceneGroup;
@@ -15,15 +16,15 @@ use Hue\Resource\Sensor;
 use InvalidArgumentException;
 use RuntimeException;
 use function ob_get_clean;
-use function var_dump;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
 {
     private $user;
-    private $bridgeIp;
+    private $ip;
+    private $name;
 
-    /** @var Group */
+    /** @var GroupGroup */
     private $groups;
     /** @var SceneGroup */
     private $scenes;
@@ -39,20 +40,23 @@ final class Bridge
         }
 
         $this->user = $user;
-        $this->bridgeIp = $bridgeIp;
+        $this->ip = $bridgeIp;
 
         $this->loadData();
     }
 
     private function loadData()
     {
-        $json = file_get_contents("http://{$this->bridgeIp}/api/{$this->user}/");
+        $json = file_get_contents("http://{$this->ip}/api/{$this->user}/");
 
         if (!$json) {
-            throw new RuntimeException("Could not connect to the bridge at {$this->bridgeIp}.");
+            throw new RuntimeException("Could not connect to the bridge at {$this->ip}.");
         }
 
         $data = json_decode($json, false);
+
+        // Bridge
+        $this->name = $data->config->name;
 
         // Groups (rooms)
         $groups = [];
@@ -73,15 +77,15 @@ final class Bridge
             }
             $scenes = new SceneGroup(...$scenes);
 
-            $groups[(int)$groupId] = new Group((int)$groupId, $group->name, $group->class, $group->type, $lights, $scenes);
+            $groups[(int)$groupId] = new Group((int)$groupId, $group->name, $group->type, $group->class, $lights, $scenes);
         }
 
-        $this->groups = $groups;
+        $this->groups = new GroupGroup(...$groups);
 
-        // Resource links
+        // ResourceInterface links
         $resourceLinks = [];
         foreach ($data->resourcelinks as $id => $resourceLink) {
-            $resourceLinks[] = new ResourceLinks((int)$id, $resourceLink->name, $resourceLink->links);
+            $resourceLinks[] = new ResourceLinks((int)$id, $resourceLink->name, $resourceLink->type, $resourceLink->links);
         }
         $this->resourceLinks = new ResourceLinksGroup(...$resourceLinks);
 
@@ -97,7 +101,9 @@ final class Bridge
     {
         ob_start();
 
-        foreach ($this->groups AS $group) {
+        echo "Groups in {$this->name}:\n\n";
+
+        foreach ($this->groups->all() AS $group) {
             echo "{$group->id()}: {$group->name()}\n";
         }
 
@@ -108,20 +114,22 @@ final class Bridge
     {
         ob_start();
 
-        foreach ($this->sensors->sensors() AS $sensor) {
+        echo "Sensors in {$this->name}:\n\n";
+
+        foreach ($this->sensors->all() AS $sensor) {
             echo "{$sensor->id()}: {$sensor->name()} ({$sensor->type()}: {$sensor->modelId()})\n";
         }
 
         return ob_get_clean();
     }
 
-    public function getScenes(int $groupId): string
+    public function getScenes(string $group): string
     {
         ob_start();
 
-        echo "Scenes for {$this->groups[$groupId]->name()}:\n";
+        echo "Scenes in {$this->name} for {$this->groups->byName($group)->name()}:\n\n";
 
-        foreach ($this->groups[$groupId]->scenes() AS $scene) {
+        foreach ($this->groups->byName($group)->scenes() AS $scene) {
             echo "{$scene->id()}: {$scene->name()}\n";
         }
 
@@ -132,9 +140,9 @@ final class Bridge
     {
         ob_start();
 
-        echo "Resource links:\n";
+        echo "ResourceInterface links in {$this->name}:\n\n";
 
-        foreach ($this->resourceLinks->resourceLinks() AS $resourceLink) {
+        foreach ($this->resourceLinks->all() AS $resourceLink) {
             echo "{$resourceLink->id()}: {$resourceLink->name()}\n";
             foreach ($resourceLink->links() as $link) {
                 echo "  - {$link}\n";
@@ -145,9 +153,10 @@ final class Bridge
         return ob_get_clean();
     }
 
-    public function programDimmerSwitch(int $switchId, int $groupId): void
+    public function programDimmerSwitch(string $switchName, string $groupName): void
     {
-        var_dump($this->resourceLinks->resourceLinksByName('Kitchen switch'));
+        $links = $this->resourceLinks->byName($switchName);
+        $group = $this->groups->a;
 
         '
             "conditions": [

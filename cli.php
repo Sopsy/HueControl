@@ -28,11 +28,11 @@ switch ($command)
         echo $hue->getSensors();
         break;
     case 'get-scenes':
-        if (empty($argv[4]) || (int)$argv[4] === 0) {
-            echo 'Missing or invalid group id';
+        if (empty($argv[4])) {
+            echo 'Missing group id';
             break;
         }
-        echo $hue->getScenes((int)$argv[4]);
+        echo $hue->getScenes($argv[4]);
         break;
     default:
         echo 'Usage: php cli.php <bridge ip> <username> <command>';

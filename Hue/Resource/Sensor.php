@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-final class Sensor
+use Hue\Contract\ResourceInterface;
+
+final class Sensor implements ResourceInterface
 {
     private $id;
     private $name;

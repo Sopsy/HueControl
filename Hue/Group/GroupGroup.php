@@ -5,20 +5,21 @@ namespace Hue\Group;
 
 use Hue\Contract\GroupInterface;
 use Hue\Contract\ResourceInterface;
-use Hue\Resource\Sensor;
+use Hue\Resource\Group;
 use RuntimeException;
 
-final class SensorGroup implements GroupInterface
+// Group of groups (rooms)
+final class GroupGroup implements GroupInterface
 {
     private $items;
 
-    public function __construct(Sensor ...$items)
+    public function __construct(Group ...$items)
     {
         $this->items = $items;
     }
 
     /**
-     * @return Sensor[]
+     * @return Group[]
      */
     public function all(): array
     {
@@ -33,6 +34,6 @@ final class SensorGroup implements GroupInterface
             }
         }
 
-        throw new RuntimeException("Sensor '{$name}' not found.");
+        throw new RuntimeException("Group '{$name}' not found.");
     }
 }
