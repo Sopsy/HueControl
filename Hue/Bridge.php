@@ -6,9 +6,10 @@ namespace Hue;
 use Hue\Api\Api;
 use Hue\Program\DimmerSwitch\BrightnessCycle;
 use Hue\Repository\GroupRepository;
+use Hue\Repository\ResourceLinkRepository;
+use Hue\Repository\SceneRepository;
 use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
-use function ob_get_clean;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
@@ -32,48 +33,49 @@ final class Bridge
         $this->name = $data->name;
     }
 
-    public function getGroups(): string
+    public function getGroups(): void
     {
-        ob_start();
 
         echo "Groups in {$this->name}:\n\n";
 
-        foreach ($this->groups->all() AS $group) {
+        foreach ((new GroupRepository($this->api))->getAll()->all() AS $group) {
             echo "{$group->id()}: {$group->name()}\n";
         }
-
-        return ob_get_clean();
     }
 
-    public function getSensors(): string
+    public function getSensors(): void
     {
-        ob_start();
 
         echo "Sensors in {$this->name}:\n\n";
 
-        foreach ($this->sensors->all() AS $sensor) {
+        foreach ((new SensorRepository($this->api))->getAll()->all() AS $sensor) {
             echo "{$sensor->id()}: {$sensor->name()} ({$sensor->type()}: {$sensor->modelId()})\n";
         }
-
-        return ob_get_clean();
     }
 
-    public function getScenes(string $group): void
+    public function getScenes(?string $group = null): void
     {
-        $groupRepo = new GroupRepository($this->api);
+        if ($group !== null) {
+            echo "Scenes in {$this->name} for {$group}:\n\n";
 
-        echo "Scenes in {$this->name} for {$group}:\n\n";
+            foreach ((new GroupRepository($this->api))->getAll()->byName($group)->scenes() AS $scene) {
+                echo "Group {$scene->group()}: {$scene->id()} ({$scene->name()})\n";
+            }
+        } else {
+            echo "Scenes in {$this->name}:\n\n";
 
-        foreach ($groupRepo->getAll()->byName($group)->scenes() AS $scene) {
-            echo "{$scene->id()}: {$scene->name()}\n";
+            foreach ((new SceneRepository($this->api))->getAll()->all() AS $scene) {
+                echo "Group {$scene->group()}: {$scene->id()} ({$scene->name()})\n";
+            }
         }
     }
 
     public function getResourceLinks(): void
     {
+
         echo "ResourceInterface links in {$this->name}:\n\n";
 
-        foreach ($this->resourceLinks->all() AS $resourceLink) {
+        foreach ((new ResourceLinkRepository($this->api))->getAll()->all() AS $resourceLink) {
             echo "{$resourceLink->id()}: {$resourceLink->name()}\n";
             foreach ($resourceLink->links() as $link) {
                 echo "  - {$link}\n";
@@ -88,29 +90,6 @@ final class Bridge
 
         $program = new BrightnessCycle($this->api, $switchName, $groupName);
         $program->apply();
-
-        return;
-        '
-            "conditions": [
-                {
-                    "address": "/sensors/' . $switchId . '/state/buttonevent",
-                    "operator": "eq",
-                    "value": "1001"
-                },
-                {
-                    "address": "/sensors/' . $switchId . '/state/lastupdated",
-                    "operator": "dx"
-                }
-            ],
-            "actions": [
-                {
-                    "address": "/groups/' . $groupId . '/action",
-                    "method": "PUT",
-                    "body": {
-                        "on": false
-                    }
-                }
-            ]';
     }
 
     public function deleteUnusedMemorySensors(): void

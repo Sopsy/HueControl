@@ -53,11 +53,7 @@ switch ($command)
 
         break;
     case 'get-scenes':
-        if (empty($argv[4])) {
-            echo 'Missing group name';
-            break;
-        }
-        echo $hue->getScenes($argv[4]);
+        echo $hue->getScenes($argv[4] ?? null);
 
         break;
     default:
