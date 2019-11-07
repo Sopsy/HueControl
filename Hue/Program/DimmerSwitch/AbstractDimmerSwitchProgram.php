@@ -43,6 +43,8 @@ abstract class AbstractDimmerSwitchProgram
                 if (in_array($condition->address, ["/sensors/{$switch->id()}/state/lastupdated", "/sensors/{$switch->id()}/state/buttonevent"])) {
                     $ruleRepo->delete($rule->id());
                     echo "Deleted rule: {$rule->id()} ({$rule->name()})\n";
+
+                    continue 2;
                 }
             }
         }
