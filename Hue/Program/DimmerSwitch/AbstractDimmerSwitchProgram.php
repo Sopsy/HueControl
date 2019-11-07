@@ -27,10 +27,9 @@ abstract class AbstractDimmerSwitchProgram
 
         $ruleRepo = new RuleRepository($this->api);
         $resourceLinkRepo = new ResourceLinkRepository($this->api);
-        $rules = $ruleRepo->getAll();
-        $resourceLinks = $resourceLinkRepo->getAll();
 
         // Remove resource links
+        $resourceLinks = $resourceLinkRepo->getAll();
         if ($resourceLinks->nameExists($this->switchName)) {
             $links = $resourceLinks->byName($this->switchName);
             $resourceLinkRepo->delete($links->id());
@@ -38,7 +37,7 @@ abstract class AbstractDimmerSwitchProgram
         }
 
         // Remove old rules
-        foreach ($rules->all() as $rule) {
+        foreach ($ruleRepo->getAll()->all() as $rule) {
             foreach ($rule->conditions() as $condition) {
                 if (in_array($condition->address, ["/sensors/{$switch->id()}/state/lastupdated", "/sensors/{$switch->id()}/state/buttonevent"])) {
                     $ruleRepo->delete($rule->id());
