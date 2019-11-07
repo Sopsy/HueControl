@@ -4,18 +4,11 @@ declare(strict_types=1);
 namespace Hue;
 
 use Hue\Api\Api;
-use Hue\Group\GroupGroup;
-use Hue\Group\ResourceLinksGroup;
-use Hue\Group\RuleGroup;
-use Hue\Group\SceneGroup;
-use Hue\Group\SensorGroup;
 use Hue\Program\DimmerSwitch\BrightnessCycle;
+use Hue\Repository\GroupRepository;
 use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use function ob_get_clean;
-use function str_replace;
-use function strpos;
-use function var_dump;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
@@ -24,17 +17,6 @@ final class Bridge
     private $ip;
     private $name;
     private $api;
-
-    /** @var GroupGroup */
-    private $groups;
-    /** @var SceneGroup */
-    private $scenes;
-    /** @var ResourceLinksGroup */
-    private $resourceLinks;
-    /** @var SensorGroup */
-    private $sensors;
-    /** @var RuleGroup */
-    private $rules;
 
     public function __construct(string $bridgeIp, string $user)
     {
@@ -76,23 +58,19 @@ final class Bridge
         return ob_get_clean();
     }
 
-    public function getScenes(string $group): string
+    public function getScenes(string $group): void
     {
-        ob_start();
+        $groupRepo = new GroupRepository($this->api);
 
-        echo "Scenes in {$this->name} for {$this->groups->byName($group)->name()}:\n\n";
+        echo "Scenes in {$this->name} for {$group}:\n\n";
 
-        foreach ($this->groups->byName($group)->scenes() AS $scene) {
+        foreach ($groupRepo->getAll()->byName($group)->scenes() AS $scene) {
             echo "{$scene->id()}: {$scene->name()}\n";
         }
-
-        return ob_get_clean();
     }
 
-    public function getResourceLinks(): string
+    public function getResourceLinks(): void
     {
-        ob_start();
-
         echo "ResourceInterface links in {$this->name}:\n\n";
 
         foreach ($this->resourceLinks->all() AS $resourceLink) {
@@ -102,17 +80,16 @@ final class Bridge
             }
             echo "\n";
         }
-
-        return ob_get_clean();
     }
 
-    public function programDimmerSwitch(string $switchName, string $groupName): string
+    public function programDimmerSwitch(string $switchName, string $groupName): void
     {
+        $this->deleteUnusedMemorySensors();
+
         $program = new BrightnessCycle($this->api, $switchName, $groupName);
         $program->apply();
 
-        return $program->output();
-
+        return;
         '
             "conditions": [
                 {
@@ -136,39 +113,9 @@ final class Bridge
             ]';
     }
 
-    public function deleteUnusedMemorySensors(): string
+    public function deleteUnusedMemorySensors(): void
     {
-        $sensorRepo = new SensorRepository($this->api);
-
-        $unusedSensors = [];
-        foreach ($this->sensors->all() as $sensor) {
-            if (in_array($sensor->type(), ['CLIPGenericStatus', 'CLIPGenericFlag'])) {
-                $unusedSensors[$sensor->id()] = $sensor;
-            }
-        }
-
-        foreach ($this->resourceLinks->all() as $resourceLink) {
-            foreach ($resourceLink->links() as $link) {
-                if (strpos($link, '/sensors/') !== 0) {
-                    continue;
-                }
-                $sensorId = (int)str_replace('/sensors/', '', $link);
-
-                // Skip non-generic sensors
-                if (!array_key_exists($sensorId, $unusedSensors)) {
-                    continue;
-                }
-
-                unset($unusedSensors[$sensorId]);
-            }
-        }
-
-        $return = '';
-        foreach ($unusedSensors as $sensorId => $sensor) {
-            $sensorRepo->delete($sensorId);
-            $return .= "Deleted unused sensor: {$sensor->id()} ({$sensor->name()})\n";
-        }
-
-        return $return;
+        echo "Deleting unused generic sensors...\n";
+        (new SensorRepository($this->api))->deleteUnusedGeneric();
     }
 }

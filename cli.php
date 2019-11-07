@@ -8,6 +8,10 @@ spl_autoload_register(function ($className) {
     require(__DIR__ . "/{$className}.php");
 });
 
+set_exception_handler(static function (Throwable $e) {
+    echo "ERROR: {$e->getMessage()}\n";
+});
+
 $hue = new Bridge($argv[1], $argv[2]);
 
 if (!isset($argv[3])) {

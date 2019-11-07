@@ -7,6 +7,10 @@ use Hue\Contract\ApiInterface;
 use Hue\Contract\GroupInterface;
 use Hue\Group\SensorGroup;
 use Hue\Resource\Sensor;
+use function array_key_exists;
+use function in_array;
+use function str_replace;
+use function strpos;
 use function uniqid;
 
 final class SensorRepository
@@ -50,7 +54,8 @@ final class SensorRepository
             'name' => $name,
             'swversion' => '1.0',
             'type' => $type,
-            'uniqueid' => uniqid('', true)
+            'uniqueid' => uniqid('', true),
+            'recycle' => true,
         ];
 
         $response = $this->api->post('/sensors/', $data);
@@ -61,5 +66,39 @@ final class SensorRepository
     public function delete(int $id): void
     {
         $this->api->delete('/sensors/' . $id);
+    }
+
+    public function deleteUnusedGeneric(): void
+    {
+        $resourceLinkRepo = new ResourceLinkRepository($this->api);
+        $sensorRepo = new SensorRepository($this->api);
+
+        $unusedSensors = [];
+        foreach ($sensorRepo->getAll()->all() as $sensor) {
+            if (in_array($sensor->type(), ['CLIPGenericStatus', 'CLIPGenericFlag'])) {
+                $unusedSensors[$sensor->id()] = $sensor;
+            }
+        }
+
+        foreach ($resourceLinkRepo->getAll()->all() as $resourceLink) {
+            foreach ($resourceLink->links() as $link) {
+                if (strpos($link, '/sensors/') !== 0) {
+                    continue;
+                }
+                $sensorId = (int)str_replace('/sensors/', '', $link);
+
+                // Skip non-generic sensors
+                if (!array_key_exists($sensorId, $unusedSensors)) {
+                    continue;
+                }
+
+                unset($unusedSensors[$sensorId]);
+            }
+        }
+
+        foreach ($unusedSensors as $sensorId => $sensor) {
+            $this->delete($sensorId);
+            echo "Deleted unused sensor: {$sensor->id()} ({$sensor->name()})\n";
+        }
     }
 }
