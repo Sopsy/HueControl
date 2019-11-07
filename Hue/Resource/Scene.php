@@ -10,12 +10,14 @@ final class Scene implements TypedResourceInterface
     private $id;
     private $name;
     private $type;
+    private $group;
 
-    public function __construct(string $id, string $name, string $type)
+    public function __construct(string $id, string $name, string $type, int $group)
     {
         $this->id = $id;
         $this->name = $name;
         $this->type = $type;
+        $this->group = $group;
     }
 
     public function id(): string
@@ -31,5 +33,10 @@ final class Scene implements TypedResourceInterface
     public function type(): string
     {
         return $this->type;
+    }
+
+    public function group(): int
+    {
+        return $this->group;
     }
 }

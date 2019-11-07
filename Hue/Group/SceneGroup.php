@@ -30,7 +30,18 @@ final class SceneGroup implements GroupInterface
             }
         }
 
-        throw new RuntimeException("Scene '{$name}'' not found.");
+        throw new RuntimeException("Scene '{$name}' not found.");
+    }
+
+    public function byNameAndGroup(string $name, int $group): ResourceInterface
+    {
+        foreach ($this->items as $item) {
+            if ($item->name() === $name && $item->group() === $group) {
+                return $item;
+            }
+        }
+
+        throw new RuntimeException("Scene '{$name}' for group '{$group}' not found.");
     }
 
     public function byId($id): ResourceInterface

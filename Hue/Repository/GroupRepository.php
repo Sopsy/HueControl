@@ -44,7 +44,7 @@ final class GroupRepository
                     continue;
                 }
 
-                $groupScenes[] = new Scene($sceneId, $scene->name, $scene->type);
+                $groupScenes[] = new Scene($sceneId, $scene->name, $scene->type, (int)$scene->group);
             }
             $groupScenes = new SceneGroup(...$groupScenes);
 
