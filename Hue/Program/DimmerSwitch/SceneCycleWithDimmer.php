@@ -12,7 +12,7 @@ use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use ReflectionClass;
 
-final class BrightnessCycle extends AbstractDimmerSwitchProgram implements Program
+final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements Program
 {
     public function apply(): void
     {
@@ -51,69 +51,18 @@ final class BrightnessCycle extends AbstractDimmerSwitchProgram implements Progr
     private function createRulesForOnButton(RuleRepository $ruleRepo, ResourceInterface $statusSensor, ResourceInterface $switch, ResourceInterface $group): void
     {
         $scenes = (new SceneRepository($this->api))->getAll();
-        $energize = $scenes->byNameAndGroup('Energize', $group->id());
         $concentrate = $scenes->byNameAndGroup('Concentrate', $group->id());
-        $read = $scenes->byNameAndGroup('Read', $group->id());
         $relax = $scenes->byNameAndGroup('Relax', $group->id());
         $nightlight = $scenes->byNameAndGroup('Nightlight', $group->id());
 
-        // 05:00 - 10:00
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press morning", [
+        // On
+        $rule = $ruleRepo->create("Switch {$switch->id()} on-press", [
             ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T05:00:00/T10:00:00'],
             ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
+            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['on' => true]],
             ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // 10:00 - 17:00
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press day", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T10:00:00/T17:00:00'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 2]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // 17:00 - 21:00
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press evening", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T17:00:00/T20:00:00'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 3]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // 21:00 - 23:00
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press late", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T21:00:00/T23:00:00'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 4]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // 23:00 - 05:00
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press night", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T23:00:00/T05:00:00'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 5]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -136,7 +85,7 @@ final class BrightnessCycle extends AbstractDimmerSwitchProgram implements Progr
             ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '2'],
         ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
+            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
             ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 3]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -148,31 +97,7 @@ final class BrightnessCycle extends AbstractDimmerSwitchProgram implements Progr
             ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '3'],
         ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 4]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // Status 4->5
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press 4", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
-            ['address' => "/sensors/{$statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '4'],
-        ], [
             ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
-            ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 5]],
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        // Status 5->1
-        $rule = $ruleRepo->create("Switch {$switch->id()} on-press 5", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
-            ['address' => "/sensors/{$statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '5'],
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
             ['address' => "/sensors/{$statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";

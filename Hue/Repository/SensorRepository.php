@@ -7,10 +7,7 @@ use Hue\Contract\ApiInterface;
 use Hue\Contract\GroupInterface;
 use Hue\Group\SensorGroup;
 use Hue\Resource\Sensor;
-use function array_key_exists;
 use function in_array;
-use function str_replace;
-use function strpos;
 use function uniqid;
 
 final class SensorRepository
@@ -70,7 +67,7 @@ final class SensorRepository
 
     public function deleteUnusedGeneric(): void
     {
-        $resourceLinkRepo = new ResourceLinkRepository($this->api);
+        $ruleRepo = new RuleRepository($this->api);
         $sensorRepo = new SensorRepository($this->api);
 
         $unusedSensors = [];
@@ -80,19 +77,14 @@ final class SensorRepository
             }
         }
 
-        foreach ($resourceLinkRepo->getAll()->all() as $resourceLink) {
-            foreach ($resourceLink->links() as $link) {
-                if (strpos($link, '/sensors/') !== 0) {
-                    continue;
+        foreach ($unusedSensors as $sensorId => $sensor) {
+            foreach ($ruleRepo->getAll()->all() as $rule) {
+                foreach ($rule->conditions() as $condition) {
+                    if ($condition->address === "/sensors/{$sensorId}/state/status") {
+                        unset($unusedSensors[$sensorId]);
+                        continue 3;
+                    }
                 }
-                $sensorId = (int)str_replace('/sensors/', '', $link);
-
-                // Skip non-generic sensors
-                if (!array_key_exists($sensorId, $unusedSensors)) {
-                    continue;
-                }
-
-                unset($unusedSensors[$sensorId]);
             }
         }
 

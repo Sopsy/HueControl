@@ -23,37 +23,42 @@ if (!isset($argv[3])) {
 switch ($command)
 {
     case 'get-resource-links':
-        echo $hue->getResourceLinks();
+        $hue->getResourceLinks();
 
         break;
     case 'get-groups':
-        echo $hue->getGroups();
+        $hue->getGroups();
 
         break;
     case 'get-sensors':
-        echo $hue->getSensors();
+        $hue->getSensors();
 
         break;
     case 'delete-unused-memory-sensors':
-        echo $hue->deleteUnusedMemorySensors();
+        $hue->deleteUnusedMemorySensors();
 
         break;
     case 'program-switch':
         if (empty($argv[4])) {
             echo 'Missing switch name';
-
             break;
         }
+
         if (empty($argv[5])) {
             echo 'Missing group (room) name';
-
             break;
         }
-        echo $hue->programDimmerSwitch($argv[4], $argv[5]);
+
+        if (empty($argv[6])) {
+            echo 'Missing program name';
+            break;
+        }
+
+        $hue->programDimmerSwitch($argv[4], $argv[5], $argv[6]);
 
         break;
     case 'get-scenes':
-        echo $hue->getScenes($argv[4] ?? null);
+        $hue->getScenes($argv[4] ?? null);
 
         break;
     default:
