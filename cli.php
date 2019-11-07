@@ -30,6 +30,10 @@ switch ($command)
         $hue->getGroups();
 
         break;
+    case 'get-scenes':
+        $hue->getScenes($argv[4] ?? null);
+
+        break;
     case 'get-sensors':
         $hue->getSensors();
 
@@ -55,10 +59,6 @@ switch ($command)
         }
 
         $hue->programDimmerSwitch($argv[4], $argv[5], $argv[6]);
-
-        break;
-    case 'get-scenes':
-        $hue->getScenes($argv[4] ?? null);
 
         break;
     default:
