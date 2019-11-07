@@ -5,6 +5,7 @@ namespace Hue;
 
 use Hue\Api\Api;
 use Hue\Program\DimmerSwitch\SceneButtons;
+use Hue\Program\DimmerSwitch\SceneButtonsWithLongOff;
 use Hue\Program\DimmerSwitch\SceneCycleWithDimmer;
 use Hue\Program\DimmerSwitch\SceneTimeCycleWithDimmer;
 use Hue\Repository\GroupRepository;
@@ -94,6 +95,9 @@ final class Bridge
                 break;
             case 'SceneButtons':
                 $programClass = new SceneButtons($this->api, $switchName, $groupName);
+                break;
+            case 'SceneButtonsWithLongOff':
+                $programClass = new SceneButtonsWithLongOff($this->api, $switchName, $groupName);
                 break;
             default;
                 echo "Unknown program '{$program}'!\n";

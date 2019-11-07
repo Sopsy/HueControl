@@ -13,7 +13,7 @@ use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use ReflectionClass;
 
-final class SceneButtons extends AbstractDimmerSwitchProgram implements Program
+final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implements Program
 {
     public function apply(): void
     {
@@ -90,6 +90,14 @@ final class SceneButtons extends AbstractDimmerSwitchProgram implements Program
             ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+        ]);
+        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
+
+        $rule = $ruleRepo->create("Switch {$switch->id()} off-long", [
+            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '4003'],
+            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
+        ], [
+            ['address' => '/groups/0/action', 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
