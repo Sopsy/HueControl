@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\TypedResourceInterface;
+use Hue\Contract\ResourceInterface;
 
-final class Light implements TypedResourceInterface
+final class Rule implements ResourceInterface
 {
     private $id;
     private $name;
-    private $type;
 
-    public function __construct(int $id, string $name, string $type)
+    public function __construct(int $id, string $name)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->type = $type;
     }
 
     public function id(): int
@@ -26,10 +24,5 @@ final class Light implements TypedResourceInterface
     public function name(): string
     {
         return $this->name;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 }

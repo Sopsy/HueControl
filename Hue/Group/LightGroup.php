@@ -32,4 +32,17 @@ final class LightGroup implements GroupInterface
 
         throw new RuntimeException("Light '{$name}' not found.");
     }
+
+    public function byId($id): ResourceInterface
+    {
+        $id = (int)$id;
+
+        foreach ($this->items as $item) {
+            if ($item->id() === $id) {
+                return $item;
+            }
+        }
+
+        throw new RuntimeException("Light ID '{$id}' not found.");
+    }
 }

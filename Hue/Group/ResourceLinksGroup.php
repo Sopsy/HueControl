@@ -35,4 +35,17 @@ final class ResourceLinksGroup implements GroupInterface
 
         throw new RuntimeException("Resource links for '{$name}' not found.");
     }
+
+    public function byId($id): ResourceInterface
+    {
+        $id = (int)$id;
+
+        foreach ($this->items as $item) {
+            if ($item->id() === $id) {
+                return $item;
+            }
+        }
+
+        throw new RuntimeException("Resource link ID '{$id}' not found.");
+    }
 }

@@ -5,22 +5,20 @@ namespace Hue\Group;
 
 use Hue\Contract\GroupInterface;
 use Hue\Contract\ResourceInterface;
-use Hue\Resource\Group;
+use Hue\Resource\Rule;
+use Hue\Resource\Scene;
 use RuntimeException;
+use function var_dump;
 
-// Group of groups (rooms)
-final class GroupGroup implements GroupInterface
+final class RuleGroup implements GroupInterface
 {
     private $items;
 
-    public function __construct(Group ...$items)
+    public function __construct(Rule ...$scenes)
     {
-        $this->items = $items;
+        $this->items = $scenes;
     }
 
-    /**
-     * @return Group[]
-     */
     public function all(): array
     {
         return $this->items;
@@ -28,13 +26,13 @@ final class GroupGroup implements GroupInterface
 
     public function byName($name): ResourceInterface
     {
-        foreach ($this->items AS $item) {
+        foreach ($this->items as $item) {
             if ($item->name() === $name) {
                 return $item;
             }
         }
 
-        throw new RuntimeException("Group '{$name}' not found.");
+        throw new RuntimeException("Rule '{$name}' not found.");
     }
 
     public function byId($id): ResourceInterface
@@ -47,6 +45,6 @@ final class GroupGroup implements GroupInterface
             }
         }
 
-        throw new RuntimeException("Group ID '{$id}' not found.");
+        throw new RuntimeException("Rule ID '{$id}' not found.");
     }
 }

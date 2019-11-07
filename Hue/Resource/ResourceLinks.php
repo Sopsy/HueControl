@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\ResourceInterface;
+use Hue\Contract\TypedResourceInterface;
+use function str_replace;
+use function strpos;
 
-final class ResourceLinks implements ResourceInterface
+final class ResourceLinks implements TypedResourceInterface
 {
     private $id;
     private $name;
@@ -38,5 +40,19 @@ final class ResourceLinks implements ResourceInterface
     public function links(): array
     {
         return $this->links;
+    }
+
+    public function linksByType(string $type): array
+    {
+        $return = [];
+        foreach ($this->links() as $link) {
+            if (strpos($link, '/' . $type . '/') !== 0) {
+                continue;
+            }
+
+            $return[] = str_replace('/' . $type . '/', '', $link);
+        }
+
+        return $return;
     }
 }

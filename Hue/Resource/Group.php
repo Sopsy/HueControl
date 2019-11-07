@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace Hue\Resource;
 
 use Hue\Contract\ResourceInterface;
+use Hue\Contract\TypedResourceInterface;
 use Hue\Group\LightGroup;
 use Hue\Group\SceneGroup;
 
-final class Group implements ResourceInterface
+final class Group implements TypedResourceInterface
 {
     private $id;
     private $name;

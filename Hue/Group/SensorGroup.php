@@ -35,4 +35,17 @@ final class SensorGroup implements GroupInterface
 
         throw new RuntimeException("Sensor '{$name}' not found.");
     }
+
+    public function byId($id): ResourceInterface
+    {
+        $id = (int)$id;
+
+        foreach ($this->items as $item) {
+            if ($item->id() === $id) {
+                return $item;
+            }
+        }
+
+        throw new RuntimeException("Sensor ID '{$id}' not found.");
+    }
 }

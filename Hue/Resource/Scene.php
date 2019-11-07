@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\ResourceInterface;
+use Hue\Contract\TypedResourceInterface;
 
-final class Scene implements ResourceInterface
+final class Scene implements TypedResourceInterface
 {
     private $id;
     private $name;

@@ -11,4 +11,6 @@ interface GroupInterface
     public function all(): array;
 
     public function byName($name): ResourceInterface;
+
+    public function byId($id): ResourceInterface;
 }

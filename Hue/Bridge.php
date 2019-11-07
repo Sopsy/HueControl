@@ -6,16 +6,20 @@ namespace Hue;
 use Hue\Group\GroupGroup;
 use Hue\Group\LightGroup;
 use Hue\Group\ResourceLinksGroup;
+use Hue\Group\RuleGroup;
 use Hue\Group\SceneGroup;
 use Hue\Group\SensorGroup;
 use Hue\Resource\Group;
 use Hue\Resource\Light;
 use Hue\Resource\ResourceLinks;
+use Hue\Resource\Rule;
 use Hue\Resource\Scene;
 use Hue\Resource\Sensor;
 use InvalidArgumentException;
-use RuntimeException;
 use function ob_get_clean;
+use function str_replace;
+use function strpos;
+use function var_dump;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
@@ -23,6 +27,7 @@ final class Bridge
     private $user;
     private $ip;
     private $name;
+    private $api;
 
     /** @var GroupGroup */
     private $groups;
@@ -32,6 +37,8 @@ final class Bridge
     private $resourceLinks;
     /** @var SensorGroup */
     private $sensors;
+    /** @var RuleGroup */
+    private $rules;
 
     public function __construct(string $bridgeIp, string $user)
     {
@@ -41,19 +48,14 @@ final class Bridge
 
         $this->user = $user;
         $this->ip = $bridgeIp;
+        $this->api = new Api($this->ip, $this->user);
 
         $this->loadData();
     }
 
     private function loadData()
     {
-        $json = file_get_contents("http://{$this->ip}/api/{$this->user}/");
-
-        if (!$json) {
-            throw new RuntimeException("Could not connect to the bridge at {$this->ip}.");
-        }
-
-        $data = json_decode($json, false);
+        $data = $this->api->get('/');
 
         // Bridge
         $this->name = $data->config->name;
@@ -95,6 +97,13 @@ final class Bridge
             $sensors[] = new Sensor((int)$id, $sensor->name, $sensor->type, $sensor->modelid);
         }
         $this->sensors = new SensorGroup(...$sensors);
+
+        // Rules
+        $rules = [];
+        foreach ($data->rules as $id => $rule) {
+            $rules[] = new Rule((int)$id, $rule->name);
+        }
+        $this->rules = new RuleGroup(...$rules);
     }
 
     public function getGroups(): string
@@ -153,10 +162,26 @@ final class Bridge
         return ob_get_clean();
     }
 
-    public function programDimmerSwitch(string $switchName, string $groupName): void
+    public function programDimmerSwitch(string $switchName, string $groupName): string
     {
         $links = $this->resourceLinks->byName($switchName);
-        $group = $this->groups->a;
+        $group = $this->groups->byName($groupName);
+
+        $return = '';
+
+        // Remove old rules
+        foreach ($links->linksByType('rules') as $link) {
+            $rule = $this->rules->byId($link);
+            $this->api->delete('/rules/' . $rule->id());
+            $return .= "Deleted rule for '{$switchName}': {$rule->id()} ({$rule->name()})\n";
+        }
+
+        // Remove possible old memory flags
+        $return .= $this->deleteUnusedMemorySensors();
+
+
+
+        return $return;
 
         '
             "conditions": [
@@ -179,5 +204,39 @@ final class Bridge
                     }
                 }
             ]';
+    }
+
+    public function deleteUnusedMemorySensors(): string
+    {
+        $unusedSensors = [];
+        foreach ($this->sensors->all() as $sensor) {
+            if (in_array($sensor->type(), ['CLIPGenericStatus', 'CLIPGenericFlag'])) {
+                $unusedSensors[$sensor->id()] = $sensor;
+            }
+        }
+
+        foreach ($this->resourceLinks->all() as $resourceLink) {
+            foreach ($resourceLink->links() as $link) {
+                if (strpos($link, '/sensors/') !== 0) {
+                    continue;
+                }
+                $sensorId = (int)str_replace('/sensors/', '', $link);
+
+                // Skip non-generic sensors
+                if (!array_key_exists($sensorId, $unusedSensors)) {
+                    continue;
+                }
+
+                unset($unusedSensors[$sensorId]);
+            }
+        }
+
+        $return = '';
+        foreach ($unusedSensors as $sensorId => $sensor) {
+            $this->api->delete('/sensors/' . $sensorId);
+            $return .= "Deleted unused sensor: {$sensor->id()} ({$sensor->name()})\n";
+        }
+
+        return $return;
     }
 }
