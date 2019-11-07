@@ -3,18 +3,14 @@ declare(strict_types=1);
 
 namespace Hue;
 
+use Hue\Api\Api;
 use Hue\Group\GroupGroup;
-use Hue\Group\LightGroup;
 use Hue\Group\ResourceLinksGroup;
 use Hue\Group\RuleGroup;
 use Hue\Group\SceneGroup;
 use Hue\Group\SensorGroup;
-use Hue\Resource\Group;
-use Hue\Resource\Light;
-use Hue\Resource\ResourceLinks;
-use Hue\Resource\Rule;
-use Hue\Resource\Scene;
-use Hue\Resource\Sensor;
+use Hue\Program\DimmerSwitch\BrightnessCycle;
+use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use function ob_get_clean;
 use function str_replace;
@@ -50,60 +46,8 @@ final class Bridge
         $this->ip = $bridgeIp;
         $this->api = new Api($this->ip, $this->user);
 
-        $this->loadData();
-    }
-
-    private function loadData()
-    {
-        $data = $this->api->get('/');
-
-        // Bridge
-        $this->name = $data->config->name;
-
-        // Groups (rooms)
-        $groups = [];
-        foreach ($data->groups AS $groupId => $group) {
-            $lights = [];
-            foreach ($group->lights AS $lightId) {
-                $lights[] = new Light((int)$lightId, $data->lights->$lightId->name, $data->lights->$lightId->type);
-            }
-            $lights = new LightGroup(...$lights);
-
-            $scenes = [];
-            foreach ($data->scenes AS $sceneId => $scene) {
-                if ($scene->type !== 'GroupScene' || $scene->group !== $groupId) {
-                    continue;
-                }
-
-                $scenes[] = new Scene($sceneId, $scene->name, $scene->type);
-            }
-            $scenes = new SceneGroup(...$scenes);
-
-            $groups[(int)$groupId] = new Group((int)$groupId, $group->name, $group->type, $group->class, $lights, $scenes);
-        }
-
-        $this->groups = new GroupGroup(...$groups);
-
-        // ResourceInterface links
-        $resourceLinks = [];
-        foreach ($data->resourcelinks as $id => $resourceLink) {
-            $resourceLinks[] = new ResourceLinks((int)$id, $resourceLink->name, $resourceLink->type, $resourceLink->links);
-        }
-        $this->resourceLinks = new ResourceLinksGroup(...$resourceLinks);
-
-        // Sensors
-        $sensors = [];
-        foreach ($data->sensors as $id => $sensor) {
-            $sensors[] = new Sensor((int)$id, $sensor->name, $sensor->type, $sensor->modelid);
-        }
-        $this->sensors = new SensorGroup(...$sensors);
-
-        // Rules
-        $rules = [];
-        foreach ($data->rules as $id => $rule) {
-            $rules[] = new Rule((int)$id, $rule->name);
-        }
-        $this->rules = new RuleGroup(...$rules);
+        $data = ($this->api->get('/config'))->response();
+        $this->name = $data->name;
     }
 
     public function getGroups(): string
@@ -164,24 +108,10 @@ final class Bridge
 
     public function programDimmerSwitch(string $switchName, string $groupName): string
     {
-        $links = $this->resourceLinks->byName($switchName);
-        $group = $this->groups->byName($groupName);
+        $program = new BrightnessCycle($this->api, $switchName, $groupName);
+        $program->apply();
 
-        $return = '';
-
-        // Remove old rules
-        foreach ($links->linksByType('rules') as $link) {
-            $rule = $this->rules->byId($link);
-            $this->api->delete('/rules/' . $rule->id());
-            $return .= "Deleted rule for '{$switchName}': {$rule->id()} ({$rule->name()})\n";
-        }
-
-        // Remove possible old memory flags
-        $return .= $this->deleteUnusedMemorySensors();
-
-
-
-        return $return;
+        return $program->output();
 
         '
             "conditions": [
@@ -208,6 +138,8 @@ final class Bridge
 
     public function deleteUnusedMemorySensors(): string
     {
+        $sensorRepo = new SensorRepository($this->api);
+
         $unusedSensors = [];
         foreach ($this->sensors->all() as $sensor) {
             if (in_array($sensor->type(), ['CLIPGenericStatus', 'CLIPGenericFlag'])) {
@@ -233,7 +165,7 @@ final class Bridge
 
         $return = '';
         foreach ($unusedSensors as $sensorId => $sensor) {
-            $this->api->delete('/sensors/' . $sensorId);
+            $sensorRepo->delete($sensorId);
             $return .= "Deleted unused sensor: {$sensor->id()} ({$sensor->name()})\n";
         }
 

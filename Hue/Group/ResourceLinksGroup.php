@@ -25,6 +25,17 @@ final class ResourceLinksGroup implements GroupInterface
         return $this->items;
     }
 
+    public function nameExists($name): bool
+    {
+        foreach ($this->items AS $item) {
+            if ($item->name() === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function byName($name): ResourceInterface
     {
         foreach ($this->items AS $item) {
@@ -34,6 +45,17 @@ final class ResourceLinksGroup implements GroupInterface
         }
 
         throw new RuntimeException("Resource links for '{$name}' not found.");
+    }
+
+    public function idExists($id): bool
+    {
+        foreach ($this->items AS $item) {
+            if ($item->id() === $id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function byId($id): ResourceInterface

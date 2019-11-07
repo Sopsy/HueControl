@@ -30,6 +30,10 @@ switch ($command)
         echo $hue->getSensors();
 
         break;
+    case 'delete-unused-memory-sensors':
+        echo $hue->deleteUnusedMemorySensors();
+
+        break;
     case 'program-switch':
         if (empty($argv[4])) {
             echo 'Missing switch name';

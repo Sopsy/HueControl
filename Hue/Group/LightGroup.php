@@ -45,4 +45,26 @@ final class LightGroup implements GroupInterface
 
         throw new RuntimeException("Light ID '{$id}' not found.");
     }
+
+    public function idExists($id): bool
+    {
+        foreach ($this->items AS $item) {
+            if ($item->id() === $id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function nameExists($name): bool
+    {
+        foreach ($this->items AS $item) {
+            if ($item->name() === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
