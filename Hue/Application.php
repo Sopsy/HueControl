@@ -13,13 +13,27 @@ final class Application
 
     public function __construct(string ...$args)
     {
-        $this->bridge = new Bridge($args[1], $args[2]);
+        if (!isset($args[1])) {
+            echo "Missing Bridge IP\n";
+            $this->printUsageHelp();
 
-        if (!isset($args[3])) {
-            $command = false;
-        } else {
-            $command = $args[3];
+            return;
         }
+        if (!isset($args[2])) {
+            echo "Missing username\n";
+            $this->printUsageHelp();
+
+            return;
+        }
+        if (!isset($args[3])) {
+            echo "Missing command\n";
+            $this->printUsageHelp();
+
+            return;
+        }
+
+        $this->bridge = new Bridge($args[1], $args[2]);
+        $command = $args[3];
 
         $args = array_slice($args, 4);
 
@@ -29,8 +43,7 @@ final class Application
     private function dispatch(string $command, string ...$args): void
     {
         if (!class_exists('\Hue\RequestHandler\\' . $command)) {
-            echo "Unknown command {$command}!\n";
-            echo 'Usage: php cli.php <bridge ip> <username> <command>';
+            echo "Unknown command '{$command}'";
 
             return;
         }
@@ -39,5 +52,10 @@ final class Application
         $className = '\Hue\RequestHandler\\' . $command;
         $class = new $className($this->bridge);
         $class->handle(...$args);
+    }
+
+    private function printUsageHelp(): void
+    {
+        echo 'Usage: php cli.php <bridge ip> <username> <command>';
     }
 }
