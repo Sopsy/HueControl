@@ -26,6 +26,10 @@ switch ($command)
         $hue->getResourceLinks();
 
         break;
+    case 'get-rules':
+        $hue->getRules();
+
+        break;
     case 'get-groups':
         $hue->getGroups();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hue;
 
 use Hue\Api\Api;
+use Hue\Repository\RuleRepository;
 use Hue\SensorProgram\DimmerSwitch;
 use Hue\SensorProgram\SmartButton;
 use Hue\SensorProgram\MotionSensor;
@@ -13,6 +14,7 @@ use Hue\Repository\SceneRepository;
 use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use ReflectionException;
+use function json_encode;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
@@ -42,6 +44,25 @@ final class Bridge
 
         foreach ((new GroupRepository($this->api))->getAll()->all() AS $group) {
             echo "{$group->id()}: {$group->name()}\n";
+        }
+    }
+
+    public function getRules(): void
+    {
+        echo "Rules in {$this->name}:\n\n";
+
+        foreach ((new RuleRepository($this->api))->getAll()->all() AS $rule) {
+            echo "{$rule->id()}: {$rule->name()}:\n";
+            echo "  Conditions:\n";
+            foreach ($rule->conditions() as $condition) {
+                $condition = json_encode($condition);
+                echo "    - {$condition}\n";
+            }
+            echo "  Actions:\n";
+            foreach ($rule->actions() as $action) {
+                $action = json_encode($action);
+                echo "    - {$action}\n";
+            }
         }
     }
 

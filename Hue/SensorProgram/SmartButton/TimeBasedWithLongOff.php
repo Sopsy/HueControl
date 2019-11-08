@@ -3,15 +3,8 @@ declare(strict_types=1);
 
 namespace Hue\SensorProgram\SmartButton;
 
-use Hue\Contract\ApiInterface;
 use Hue\Contract\Program;
-use Hue\Contract\ResourceInterface;
-use Hue\Repository\GroupRepository;
-use Hue\Repository\RuleRepository;
 use Hue\Repository\SceneRepository;
-use Hue\Repository\SensorRepository;
-use InvalidArgumentException;
-use ReflectionClass;
 
 final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements Program
 {

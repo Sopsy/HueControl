@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use function in_array;
-use function var_dump;
 
 abstract class AbstractSensorProgram
 {
@@ -79,7 +78,11 @@ abstract class AbstractSensorProgram
         // Remove old rules
         foreach ($ruleRepo->getAll()->all() as $rule) {
             foreach ($rule->conditions() as $condition) {
-                if (in_array($condition->address, ["/sensors/{$this->sensor->id()}/state/lastupdated", "/sensors/{$this->sensor->id()}/state/buttonevent"])) {
+                if (in_array($condition->address, [
+                        "/sensors/{$this->sensor->id()}/state/lastupdated",
+                        "/sensors/{$this->sensor->id()}/state/buttonevent",
+                        "/sensors/{$this->sensor->id()}/state/presence",
+                    ])) {
                     $ruleRepo->delete($rule->id());
                     echo "Deleted rule: {$rule->id()} ({$rule->name()})\n";
 

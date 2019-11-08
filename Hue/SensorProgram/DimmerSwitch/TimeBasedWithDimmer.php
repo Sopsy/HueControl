@@ -4,13 +4,7 @@ declare(strict_types=1);
 namespace Hue\SensorProgram\DimmerSwitch;
 
 use Hue\Contract\Program;
-use Hue\Contract\ResourceInterface;
-use Hue\Repository\GroupRepository;
-use Hue\Repository\RuleRepository;
 use Hue\Repository\SceneRepository;
-use Hue\Repository\SensorRepository;
-use InvalidArgumentException;
-use ReflectionClass;
 
 final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements Program
 {
