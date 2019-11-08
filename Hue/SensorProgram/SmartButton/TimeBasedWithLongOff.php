@@ -110,7 +110,7 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // Long press when lights are off = bright
-        $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} long-press, lights on", [
+        $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} long-press, lights off", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
