@@ -8,6 +8,7 @@ use Hue\Program\DimmerSwitch\SceneButtons;
 use Hue\Program\DimmerSwitch\SceneButtonsWithLongOff;
 use Hue\Program\DimmerSwitch\SceneCycleWithDimmer;
 use Hue\Program\DimmerSwitch\SceneTimeCycleWithDimmer;
+use Hue\Program\DimmerSwitch\TimeBasedWithDimmer;
 use Hue\Repository\GroupRepository;
 use Hue\Repository\ResourceLinkRepository;
 use Hue\Repository\SceneRepository;
@@ -98,6 +99,9 @@ final class Bridge
                 break;
             case 'SceneButtonsWithLongOff':
                 $programClass = new SceneButtonsWithLongOff($this->api, $switchName, $groupName);
+                break;
+            case 'TimeBasedWithDimmer':
+                $programClass = new TimeBasedWithDimmer($this->api, $switchName, $groupName);
                 break;
             default;
                 echo "Unknown program '{$program}'!\n";
