@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hue;
 
 use Hue\Api\Api;
+use Hue\Repository\LightRepository;
 use Hue\Repository\RuleRepository;
 use Hue\SensorProgram\DimmerSwitch;
 use Hue\SensorProgram\SmartButton;
@@ -36,6 +37,18 @@ final class Bridge
 
         $data = ($this->api->get('/config'))->response();
         $this->name = $data->name;
+    }
+
+    public function getLights(): void
+    {
+        echo "Lights in {$this->name}:\n\n";
+
+        foreach ((new LightRepository($this->api))->getAll()->all() AS $light) {
+            echo "{$light->id()}: {$light->name()}\n";
+            echo "  - Type: {$light->type()}\n";
+            echo "  - Model: {$light->model()}\n";
+            echo "  - Color gamut: {$light->gamutType()}\n";
+        }
     }
 
     public function getGroups(): void

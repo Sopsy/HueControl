@@ -18,6 +18,8 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
 #### Supported commands
 - `get-resource-links`
   - List resource links in the Hue Bridge
+- `get-lights`
+  - List lights in the Hue Bridge
 - `get-groups`
   - List groups (rooms) in the Hue Bridge
 - `get-rules`

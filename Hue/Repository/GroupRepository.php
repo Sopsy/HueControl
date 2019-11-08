@@ -11,9 +11,6 @@ use Hue\Group\SceneGroup;
 use Hue\Resource\Group;
 use Hue\Resource\Light;
 use Hue\Resource\Scene;
-use Hue\Resource\Sensor;
-use function uniqid;
-use function var_dump;
 
 final class GroupRepository
 {
