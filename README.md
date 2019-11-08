@@ -16,19 +16,19 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
 `php cli.php <bridge-ip> <username> <command> [...command arguments]`
 
 #### Supported commands
-- `get-resource-links`
+- `GetResourceLinks`
   - List resource links in the Hue Bridge
-- `get-lights`
+- `GetLights`
   - List lights in the Hue Bridge
-- `get-groups`
+- `GetGroups`
   - List groups (rooms) in the Hue Bridge
-- `get-rules`
+- `GetRules`
   - List rules in the Hue Bridge
-- `get-scenes [room name]`
+- `GetScenes [room name]`
   - List all scenes in the Hue Bridge for all rooms or in "room name"
-- `get-sensors`
+- `GetSensors`
   - List sensors (buttons, motion sensors, flags, etc.) int he Hue Bridge
-- `delete-unused-memory-sensors`
+- `DeleteUnusedMemorySensors`
   - Delete memory sensors (boolean and integer flags) that are not used by any rules
-- `program-sensor <sensor name> <group name> <program name>`
+- `ProgramSensor <sensor name> <group name> <program name>`
   - Apply "program name" to "sensor name" to control room "group name"

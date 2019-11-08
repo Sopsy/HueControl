@@ -29,8 +29,10 @@ final class SceneRepository
         return new SceneGroup(...$scenes);
     }
 
-    public function delete(int $id): void
+    public function delete(string $id): void
     {
-        $this->api->delete('/scenes/' . $id);
+        $result = $this->api->delete('/scenes/' . $id);
+
+        echo $result;
     }
 }

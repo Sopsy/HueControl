@@ -3,17 +3,16 @@ declare(strict_types=1);
 
 namespace Hue;
 
-use function array_key_exists;
+use Hue\Contract\RequestHandlerInterface;
 use function array_slice;
+use function class_exists;
 
 final class Application
 {
-    private $routes;
     private $bridge;
 
     public function __construct(string ...$args)
     {
-        $this->routes = require __DIR__ . '/Config/Routes.php';
         $this->bridge = new Bridge($args[1], $args[2]);
 
         if (!isset($args[3])) {
@@ -29,12 +28,15 @@ final class Application
 
     private function dispatch(string $command, string ...$args): void
     {
-        if (!array_key_exists($command, $this->routes)) {
+        if (!class_exists('\Hue\RequestHandler\\' . $command)) {
             echo 'Usage: php cli.php <bridge ip> <username> <command>';
 
             return;
         }
 
-        ($this->routes[$command])()->handle(...$args);
+        /** @var $class RequestHandlerInterface */
+        $className = '\Hue\RequestHandler\\' . $command;
+        $class = new $className($this->bridge);
+        $class->handle(...$args);
     }
 }
