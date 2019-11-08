@@ -29,6 +29,7 @@ final class Application
     private function dispatch(string $command, string ...$args): void
     {
         if (!class_exists('\Hue\RequestHandler\\' . $command)) {
+            echo "Unknown command {$command}!\n";
             echo 'Usage: php cli.php <bridge ip> <username> <command>';
 
             return;
