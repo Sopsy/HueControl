@@ -20,11 +20,11 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
     private function createRulesForOnButton(): void
     {
         $scenes = (new SceneRepository($this->api))->getAll();
-        $energize = $scenes->byNameAndGroup('Energize', $this->group->id());
-        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->group->id());
-        $read = $scenes->byNameAndGroup('Read', $this->group->id());
-        $relax = $scenes->byNameAndGroup('Relax', $this->group->id());
-        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->group->id());
+        $energize = $scenes->byNameAndGroup('Energize', $this->groupOrLight->id());
+        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->groupOrLight->id());
+        $read = $scenes->byNameAndGroup('Read', $this->groupOrLight->id());
+        $relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
+        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
         // 05:30 - 11:00
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press morning", [
@@ -32,7 +32,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T05:30:00/T11:00:00'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -42,7 +42,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T11:00:00/T17:00:00'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -52,7 +52,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T17:00:00/T20:00:00'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -62,7 +62,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T20:00:00/T00:00:00'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -72,7 +72,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T00:00:00/T05:30:00'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -81,7 +81,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1003'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
@@ -92,7 +92,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 8,
                 'bri_inc' => 25
             ]]
@@ -107,7 +107,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 8,
                 'bri_inc' => -25
             ]]
@@ -121,7 +121,7 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '4000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }

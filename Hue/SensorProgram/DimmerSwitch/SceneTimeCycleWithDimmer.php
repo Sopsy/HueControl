@@ -26,20 +26,20 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
     private function createRulesForOnButton(): void
     {
         $scenes = (new SceneRepository($this->api))->getAll();
-        $energize = $scenes->byNameAndGroup('Energize', $this->group->id());
-        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->group->id());
-        $read = $scenes->byNameAndGroup('Read', $this->group->id());
-        $relax = $scenes->byNameAndGroup('Relax', $this->group->id());
-        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->group->id());
+        $energize = $scenes->byNameAndGroup('Energize', $this->groupOrLight->id());
+        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->groupOrLight->id());
+        $read = $scenes->byNameAndGroup('Read', $this->groupOrLight->id());
+        $relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
+        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
         // 05:00 - 10:00
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press morning", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T05:00:00/T10:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -49,9 +49,9 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T10:00:00/T17:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 2]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -61,9 +61,9 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T17:00:00/T20:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 3]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -73,9 +73,9 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T20:00:00/T23:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 4]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -85,9 +85,9 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T23:00:00/T05:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 5]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -96,10 +96,10 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press 1", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '1'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 2]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -108,10 +108,10 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press 2", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '2'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 3]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -120,10 +120,10 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press 3", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '3'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 4]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -132,10 +132,10 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press 4", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '4'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 5]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -144,10 +144,10 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press 5", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->statusSensor->id()}/state/status", 'operator' => 'eq', 'value' => '5'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
@@ -159,7 +159,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
                 'bri_inc' => 30
             ]]
@@ -170,7 +170,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
                 'bri_inc' => 56
             ]]
@@ -181,7 +181,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2003'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'bri_inc' => 0
             ]]
         ]);
@@ -194,7 +194,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
                 'bri_inc' => -30
             ]]
@@ -205,7 +205,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
                 'bri_inc' => -56
             ]]
@@ -216,7 +216,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3003'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => [
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => [
                 'bri_inc' => 0
             ]]
         ]);
@@ -229,7 +229,7 @@ final class SceneTimeCycleWithDimmer extends AbstractDimmerSwitchProgram impleme
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '4000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 0]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";

@@ -39,4 +39,9 @@ final class Rule implements ResourceInterface
     {
         return $this->actions;
     }
+
+    public function apiUrl(): string
+    {
+        return "/rules/{$this->id()}";
+    }
 }

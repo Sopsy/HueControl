@@ -25,4 +25,9 @@ final class Schedule implements ResourceInterface
     {
         return $this->name;
     }
+
+    public function apiUrl(): string
+    {
+        return "/schedules/{$this->id()}";
+    }
 }

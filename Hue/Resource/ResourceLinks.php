@@ -55,4 +55,9 @@ final class ResourceLinks implements TypedResourceInterface
 
         return $return;
     }
+
+    public function apiUrl(): string
+    {
+        return "/resourcelinks/{$this->id()}";
+    }
 }

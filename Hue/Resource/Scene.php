@@ -39,4 +39,9 @@ final class Scene implements TypedResourceInterface
     {
         return $this->group;
     }
+
+    public function apiUrl(): string
+    {
+        return "/scenes/{$this->id()}";
+    }
 }

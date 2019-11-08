@@ -17,20 +17,20 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
     private function createRulesForPresence(): void
     {
         $scenes = (new SceneRepository($this->api))->getAll();
-        $energize = $scenes->byNameAndGroup('Energize', $this->group->id());
-        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->group->id());
-        $read = $scenes->byNameAndGroup('Read', $this->group->id());
-        $relax = $scenes->byNameAndGroup('Relax', $this->group->id());
-        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->group->id());
+        $energize = $scenes->byNameAndGroup('Energize', $this->groupOrLight->id());
+        $concentrate = $scenes->byNameAndGroup('Concentrate', $this->groupOrLight->id());
+        $read = $scenes->byNameAndGroup('Read', $this->groupOrLight->id());
+        $relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
+        $nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
         // 05:30 - 11:00
         $rule = $this->ruleRepo->create("Motion {$this->sensor->id()} presence morning", [
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T05:30:00/T11:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $energize->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -39,9 +39,9 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T11:00:00/T17:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -50,9 +50,9 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T17:00:00/T20:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $read->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -61,9 +61,9 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T20:00:00/T00:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -72,9 +72,9 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'true'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T00:00:00/T05:30:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
@@ -84,9 +84,9 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
         $rule = $this->ruleRepo->create("Motion {$this->sensor->id()} no-presence", [
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'false'],
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx', 'value' => 'PT00:09:15'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }

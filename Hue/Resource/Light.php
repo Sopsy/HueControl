@@ -5,10 +5,11 @@ namespace Hue\Resource;
 
 use Hue\Contract\HasGamut;
 use Hue\Contract\HasModel;
+use Hue\Contract\HasSetStateUrl;
 use Hue\Contract\IsProduct;
 use Hue\Contract\TypedResourceInterface;
 
-final class Light implements TypedResourceInterface, HasModel, HasGamut, IsProduct
+final class Light implements TypedResourceInterface, HasModel, HasGamut, IsProduct, HasSetStateUrl
 {
     private $id;
     private $name;
@@ -70,5 +71,15 @@ final class Light implements TypedResourceInterface, HasModel, HasGamut, IsProdu
     public function productName(): string
     {
         return $this->productName;
+    }
+
+    public function apiUrl(): string
+    {
+        return "/lights/{$this->id()}";
+    }
+
+    public function apiSetStateUrl(): string
+    {
+        return "{$this->apiUrl()}/state";
     }
 }

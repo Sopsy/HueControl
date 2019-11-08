@@ -39,4 +39,9 @@ final class Sensor implements TypedResourceInterface
     {
         return $this->modelId;
     }
+
+    public function apiUrl(): string
+    {
+        return "/sensors/{$this->id()}";
+    }
 }

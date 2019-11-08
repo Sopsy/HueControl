@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
+use Hue\Contract\HasSetStateUrl;
 use Hue\Contract\ResourceInterface;
 use Hue\Contract\TypedResourceInterface;
 use Hue\Group\LightGroup;
 use Hue\Group\SceneGroup;
 
-final class Group implements TypedResourceInterface
+final class Group implements TypedResourceInterface, HasSetStateUrl
 {
     private $id;
     private $name;
@@ -59,5 +60,15 @@ final class Group implements TypedResourceInterface
     public function findScene(string $name): ResourceInterface
     {
         return $this->scenes->byName($name);
+    }
+
+    public function apiUrl(): string
+    {
+        return "/groups/{$this->id()}";
+    }
+
+    public function apiSetStateUrl(): string
+    {
+        return "{$this->apiUrl()}/action";
     }
 }

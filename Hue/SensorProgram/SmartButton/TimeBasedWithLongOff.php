@@ -17,11 +17,11 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
     public function apply(): void
     {
         $scenes = (new SceneRepository($this->api))->getAll();
-        $this->energize = $scenes->byNameAndGroup('Energize', $this->group->id());
-        $this->concentrate = $scenes->byNameAndGroup('Concentrate', $this->group->id());
-        $this->read = $scenes->byNameAndGroup('Read', $this->group->id());
-        $this->relax = $scenes->byNameAndGroup('Relax', $this->group->id());
-        $this->nightlight = $scenes->byNameAndGroup('Nightlight', $this->group->id());
+        $this->energize = $scenes->byNameAndGroup('Energize', $this->groupOrLight->id());
+        $this->concentrate = $scenes->byNameAndGroup('Concentrate', $this->groupOrLight->id());
+        $this->read = $scenes->byNameAndGroup('Read', $this->groupOrLight->id());
+        $this->relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
+        $this->nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
         // Create rules
         $this->createRulesForShortPress();
@@ -35,9 +35,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} short-rele, lights on", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -46,9 +46,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T05:30:00/T11:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->energize->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->energize->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -57,9 +57,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T11:00:00/T17:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -68,9 +68,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T17:00:00/T20:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->read->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->read->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -79,9 +79,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T20:00:00/T00:00:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->relax->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
@@ -90,9 +90,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1002'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
             ['address' => '/config/localtime', 'operator' => 'in', 'value' => 'T00:00:00/T05:30:00'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->nightlight->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
@@ -103,7 +103,7 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} long-press, lights on", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
         ], [
             ['address' => '/groups/0/action', 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
@@ -113,9 +113,9 @@ final class TimeBasedWithLongOff extends AbstractSmartButtonProgram implements P
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} long-press, lights on", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1001'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
-            ['address' => "/groups/{$this->group->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
+            ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'false'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }

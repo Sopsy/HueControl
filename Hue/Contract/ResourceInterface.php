@@ -11,4 +11,6 @@ interface ResourceInterface
     public function id();
 
     public function name(): string;
+
+    public function apiUrl(): string;
 }

@@ -5,6 +5,7 @@ namespace Hue\SensorProgram;
 
 use Hue\Contract\ApiInterface;
 use Hue\Repository\GroupRepository;
+use Hue\Repository\LightRepository;
 use Hue\Repository\ResourceLinkRepository;
 use Hue\Repository\RuleRepository;
 use Hue\Repository\SensorRepository;
@@ -17,10 +18,11 @@ abstract class AbstractSensorProgram
 {
     protected $api;
     protected $sensor;
-    protected $group;
-    protected $groupRepo;
+    protected $groupOrLight;
     protected $ruleRepo;
     protected $sensorRepo;
+    protected $singleLight;
+    protected $supportsSingleLight = false;
 
     /**
      * AbstractSensorProgram constructor.
@@ -32,17 +34,24 @@ abstract class AbstractSensorProgram
     public function __construct(ApiInterface $api, string $sensorName, string $groupName)
     {
         $this->api = $api;
-        $this->groupRepo = new GroupRepository($this->api);
         $this->ruleRepo = new RuleRepository($this->api);
         $this->sensorRepo = new SensorRepository($this->api);
 
-        $groups = $this->groupRepo->getAll();
+        $groups = (new GroupRepository($this->api))->getAll();
         $sensors = $this->sensorRepo->getAll();
 
         if (!$groups->nameExists($groupName)) {
-            throw new InvalidArgumentException("Group '{$groupName}' does not exist");
+            // Maybe it is a single light?
+            $lights = (new LightRepository($this->api))->getAll();
+            if (!$lights->nameExists($groupName)) {
+                throw new InvalidArgumentException("Group or light '{$groupName}' does not exist");
+            }
+            $this->groupOrLight = $lights->byName($groupName);
+            $this->singleLight = true;
+        } else {
+            $this->groupOrLight = $groups->byName($groupName);
+            $this->singleLight = false;
         }
-        $this->group = $groups->byName($groupName);
 
         if (!$sensors->nameExists($sensorName)) {
             throw new InvalidArgumentException("Sensor '{$sensorName}' does not exist");
@@ -53,7 +62,11 @@ abstract class AbstractSensorProgram
             throw new InvalidArgumentException('Incompatible sensor type for selected program');
         }
 
-        echo 'Installing program ' . (new ReflectionClass($this))->getShortName() . " to '{$sensorName}' to control group '{$groupName}'...\n";
+         if ($this->singleLight && !$this->supportsSingleLight) {
+             throw new InvalidArgumentException('This program does not support single lights');
+         }
+
+        echo 'Installing program ' . (new ReflectionClass($this))->getShortName() . " to '{$sensorName}' to control group or light '{$groupName}'...\n";
 
         $this->removeOldRules();
 

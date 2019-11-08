@@ -23,36 +23,36 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
 
     private function createRulesForOnButton(): void
     {
-        $concentrate = $this->scenes->byNameAndGroup('Concentrate', $this->group->id());
+        $concentrate = $this->scenes->byNameAndGroup('Concentrate', $this->groupOrLight->id());
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
     private function createRulesForUpButton(): void
     {
-        $relax = $this->scenes->byNameAndGroup('Relax', $this->group->id());
+        $relax = $this->scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
     private function createRulesForDownButton(): void
     {
-        $nightlight = $this->scenes->byNameAndGroup('Nightlight', $this->group->id());
+        $nightlight = $this->scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
@@ -63,7 +63,7 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '4000'],
             ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
-            ['address' => "/groups/{$this->group->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
+            ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
