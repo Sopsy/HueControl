@@ -83,7 +83,7 @@ final class TimeBased extends AbstractMotionSensorProgram implements Program
     {
         $rule = $this->ruleRepo->create("Motion {$this->sensor->id()} no-presence", [
             ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'eq', 'value' => 'false'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'dx', 'value' => 'PT00:09:15'],
+            ['address' => "/sensors/{$this->sensor->id()}/state/presence", 'operator' => 'ddx', 'value' => 'PT00:09:15'],
             ['address' => "/groups/{$this->groupOrLight->id()}/state/any_on", 'operator' => 'eq', 'value' => 'true'],
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
