@@ -45,6 +45,8 @@ final class Bridge
 
         foreach ((new LightRepository($this->api))->getAll()->all() AS $light) {
             echo "{$light->id()}: {$light->name()}\n";
+            echo "  - Manufacturer: {$light->manufacturer()}\n";
+            echo "  - Product: {$light->productName()}\n";
             echo "  - Type: {$light->type()}\n";
             echo "  - Model: {$light->model()}\n";
             echo "  - Color gamut: {$light->gamutType()}\n";

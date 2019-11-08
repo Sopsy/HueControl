@@ -23,7 +23,15 @@ final class LightRepository
 
         $groupLights = [];
         foreach ($lights AS $lightId => $light) {
-            $groupLights[] = new Light((int)$lightId, $light->name, $light->type, $light->modelid, $light->capabilities->control->colorgamuttype);
+            $groupLights[] = new Light(
+                (int)$lightId,
+                $light->name,
+                $light->type,
+                $light->modelid,
+                $light->capabilities->control->colorgamuttype,
+                $light->manufacturername,
+                $light->productname
+            );
         }
         return new LightGroup(...$groupLights);
     }
