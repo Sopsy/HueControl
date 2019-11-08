@@ -25,10 +25,12 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
 - `GetRules`
   - List rules in the Hue Bridge
 - `GetScenes [room name]`
-  - List all scenes in the Hue Bridge for all rooms or in "room name"
+  - List all scenes in the Hue Bridge for all rooms or in `room name`
+- `DeleteScene <scene id>`
+  - Delete a scene with id `scene id`
 - `GetSensors`
   - List sensors (buttons, motion sensors, flags, etc.) int he Hue Bridge
 - `DeleteUnusedMemorySensors`
   - Delete memory sensors (boolean and integer flags) that are not used by any rules
 - `ProgramSensor <sensor name> <group name> <program name>`
-  - Apply "program name" to "sensor name" to control room "group name"
+  - Apply `program name` to `sensor name` to control room `group name`
