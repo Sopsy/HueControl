@@ -9,6 +9,7 @@ use Hue\Program\DimmerSwitch\SceneButtonsWithLongOff;
 use Hue\Program\DimmerSwitch\SceneCycleWithDimmer;
 use Hue\Program\DimmerSwitch\SceneTimeCycleWithDimmer;
 use Hue\Program\DimmerSwitch\TimeBasedWithDimmer;
+use Hue\Program\SmartButton\TimeBasedWithLongOff;
 use Hue\Repository\GroupRepository;
 use Hue\Repository\ResourceLinkRepository;
 use Hue\Repository\SceneRepository;
@@ -88,20 +89,23 @@ final class Bridge
     public function programDimmerSwitch(string $switchName, string $groupName, string $program): void
     {
         switch ($program) {
-            case 'SceneCycleWithDimmer':
+            case 'DimmerSwitch-SceneCycleWithDimmer':
                 $programClass = new SceneCycleWithDimmer($this->api, $switchName, $groupName);
                 break;
-            case 'SceneTimeCycleWithDimmer':
+            case 'DimmerSwitch-SceneTimeCycleWithDimmer':
                 $programClass = new SceneTimeCycleWithDimmer($this->api, $switchName, $groupName);
                 break;
-            case 'SceneButtons':
+            case 'DimmerSwitch-SceneButtons':
                 $programClass = new SceneButtons($this->api, $switchName, $groupName);
                 break;
-            case 'SceneButtonsWithLongOff':
+            case 'DimmerSwitch-SceneButtonsWithLongOff':
                 $programClass = new SceneButtonsWithLongOff($this->api, $switchName, $groupName);
                 break;
-            case 'TimeBasedWithDimmer':
+            case 'DimmerSwitch-TimeBasedWithDimmer':
                 $programClass = new TimeBasedWithDimmer($this->api, $switchName, $groupName);
+                break;
+            case 'SmartButton-TimeBasedWithLongOff':
+                $programClass = new TimeBasedWithLongOff($this->api, $switchName, $groupName);
                 break;
             default;
                 echo "Unknown program '{$program}'!\n";
