@@ -2,7 +2,7 @@
 Personal project to program the Philips Hue bridge more easily.
 
 I got fed up on doing all of the configuration manually with a phone without a way to do it on a computer
-or to write the same rules for multiple switches at once.
+or to write the same rules for multiple sensors at once.
 
 Programs is hardcoded and features are missing as this is not meant for public use, it only has what I use.
 To create more programs, add them to the Program -namespace and to the switch in Bridge.php
@@ -26,5 +26,5 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
   - List sensors (buttons, motion sensors, flags, etc.) int he Hue Bridge.
 - `delete-unused-memory-sensors`
   - Delete memory sensors (boolean and integer flags) that are not used by any rules.
-- `program-switch <switch name> <group name> <program name>`
-  - Apply "program name" to "switch name" to control room "group name".
+- `program-sensor <sensor name> <group name> <program name>`
+  - Apply "program name" to "sensor name" to control room "group name".

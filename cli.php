@@ -42,9 +42,9 @@ switch ($command)
         $hue->deleteUnusedMemorySensors();
 
         break;
-    case 'program-switch':
+    case 'program-sensor':
         if (empty($argv[4])) {
-            echo 'Missing switch name';
+            echo 'Missing sensor name';
             break;
         }
 
@@ -58,7 +58,7 @@ switch ($command)
             break;
         }
 
-        $hue->programDimmerSwitch($argv[4], $argv[5], $argv[6]);
+        $hue->programSensor($argv[4], $argv[5], $argv[6]);
 
         break;
     default:

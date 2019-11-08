@@ -4,17 +4,15 @@ declare(strict_types=1);
 namespace Hue;
 
 use Hue\Api\Api;
-use Hue\Program\DimmerSwitch\SceneButtons;
-use Hue\Program\DimmerSwitch\SceneButtonsWithLongOff;
-use Hue\Program\DimmerSwitch\SceneCycleWithDimmer;
-use Hue\Program\DimmerSwitch\SceneTimeCycleWithDimmer;
-use Hue\Program\DimmerSwitch\TimeBasedWithDimmer;
-use Hue\Program\SmartButton\TimeBasedWithLongOff;
+use Hue\SensorProgram\DimmerSwitch;
+use Hue\SensorProgram\SmartButton;
+use Hue\SensorProgram\MotionSensor;
 use Hue\Repository\GroupRepository;
 use Hue\Repository\ResourceLinkRepository;
 use Hue\Repository\SceneRepository;
 use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
+use ReflectionException;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
@@ -86,33 +84,40 @@ final class Bridge
         }
     }
 
-    public function programDimmerSwitch(string $switchName, string $groupName, string $program): void
+    /**
+     * @param string $sensorName
+     * @param string $groupName
+     * @param string $program
+     * @throws ReflectionException
+     */
+    public function programSensor(string $sensorName, string $groupName, string $program): void
     {
         switch ($program) {
             case 'DimmerSwitch-SceneCycleWithDimmer':
-                $programClass = new SceneCycleWithDimmer($this->api, $switchName, $groupName);
+                new DimmerSwitch\SceneCycleWithDimmer($this->api, $sensorName, $groupName);
                 break;
             case 'DimmerSwitch-SceneTimeCycleWithDimmer':
-                $programClass = new SceneTimeCycleWithDimmer($this->api, $switchName, $groupName);
+                new DimmerSwitch\SceneTimeCycleWithDimmer($this->api, $sensorName, $groupName);
                 break;
             case 'DimmerSwitch-SceneButtons':
-                $programClass = new SceneButtons($this->api, $switchName, $groupName);
+                new DimmerSwitch\SceneButtons($this->api, $sensorName, $groupName);
                 break;
             case 'DimmerSwitch-SceneButtonsWithLongOff':
-                $programClass = new SceneButtonsWithLongOff($this->api, $switchName, $groupName);
+                new DimmerSwitch\SceneButtonsWithLongOff($this->api, $sensorName, $groupName);
                 break;
             case 'DimmerSwitch-TimeBasedWithDimmer':
-                $programClass = new TimeBasedWithDimmer($this->api, $switchName, $groupName);
+                new DimmerSwitch\TimeBasedWithDimmer($this->api, $sensorName, $groupName);
                 break;
             case 'SmartButton-TimeBasedWithLongOff':
-                $programClass = new TimeBasedWithLongOff($this->api, $switchName, $groupName);
+                new SmartButton\TimeBasedWithLongOff($this->api, $sensorName, $groupName);
+                break;
+            case 'MotionSensor-TimeBased':
+                new MotionSensor\TimeBased($this->api, $sensorName, $groupName);
                 break;
             default;
                 echo "Unknown program '{$program}'!\n";
                 return;
         }
-
-        $programClass->apply();
 
         $this->deleteUnusedMemorySensors();
 
