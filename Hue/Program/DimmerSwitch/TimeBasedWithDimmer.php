@@ -102,73 +102,41 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
+
+        // Long press = bright
+        $rule = $ruleRepo->create("Switch {$switch->id()} on-long", [
+            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1003'],
+            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx'],
+        ], [
+            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
+        ]);
+        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
     private function createRulesForUpButton(RuleRepository $ruleRepo, ResourceInterface $switch, ResourceInterface $group): void
     {
-        $rule = $ruleRepo->create("Switch {$switch->id()} up-press", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'transitiontime' => 9,
-                'bri_inc' => 30
-            ]]
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
         $rule = $ruleRepo->create("Switch {$switch->id()} up-long", [
             ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2001'],
             ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
             ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'transitiontime' => 9,
-                'bri_inc' => 56
+                'transitiontime' => 8,
+                'bri_inc' => 25
             ]]
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
-        $rule = $ruleRepo->create("Switch {$switch->id()} up-rele", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2003'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'bri_inc' => 0
-            ]]
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
     private function createRulesForDownButton(RuleRepository $ruleRepo, ResourceInterface $switch, ResourceInterface $group): void
     {
-        $rule = $ruleRepo->create("Switch {$switch->id()} down-press", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3000'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'transitiontime' => 9,
-                'bri_inc' => -30
-            ]]
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
         $rule = $ruleRepo->create("Switch {$switch->id()} down-long", [
             ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3001'],
             ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
         ], [
             ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'transitiontime' => 9,
-                'bri_inc' => -56
-            ]]
-        ]);
-        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
-
-        $rule = $ruleRepo->create("Switch {$switch->id()} down-rele", [
-            ['address' => "/sensors/{$switch->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3003'],
-            ['address' => "/sensors/{$switch->id()}/state/lastupdated", 'operator' => 'dx']
-        ], [
-            ['address' => "/groups/{$group->id()}/action", 'method' => 'PUT', 'body' => [
-                'bri_inc' => 0
+                'transitiontime' => 8,
+                'bri_inc' => -25
             ]]
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
