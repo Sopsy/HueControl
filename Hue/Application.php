@@ -4,38 +4,32 @@ declare(strict_types=1);
 namespace Hue;
 
 use Hue\Contract\RequestHandlerInterface;
-use function array_slice;
 use function class_exists;
 
 final class Application
 {
     private $bridge;
 
-    public function __construct(string ...$args)
+    public function __construct(string $bridgeIp, string $username, string $command = '', string ...$args)
     {
-        if (!isset($args[1])) {
-            echo "Missing Bridge IP\n";
-            $this->printUsageHelp();
-
-            return;
-        }
-        if (!isset($args[2])) {
-            echo "Missing username\n";
-            $this->printUsageHelp();
-
-            return;
-        }
-        if (!isset($args[3])) {
+        if (empty($command)) {
             echo "Missing command\n";
             $this->printUsageHelp();
 
             return;
         }
 
-        $this->bridge = new Bridge($args[1], $args[2]);
-        $command = $args[3];
+        if ($command !== 'CreateConfig') {
+            if (!empty($username)) {
+                $this->bridge = new Bridge($bridgeIp, $username);
+            } else {
+                echo "Bridge username missing, run CreateConfig command to create one\n";
 
-        $args = array_slice($args, 4);
+                return;
+            }
+        } else {
+            $this->bridge = $bridgeIp;
+        }
 
         $this->dispatch($command, ...$args);
     }
