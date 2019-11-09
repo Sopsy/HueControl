@@ -5,6 +5,7 @@ namespace Hue\RequestHandler;
 
 use Hue\Bridge;
 use Hue\Repository\SensorRepository;
+use function number_format;
 
 final class GetTemp
 {
@@ -21,7 +22,7 @@ final class GetTemp
 
         foreach ((new SensorRepository($this->bridge->api()))->getAll()->allTemp() AS $sensor) {
             echo "{$sensor->id()}: {$sensor->name()} ({$sensor->type()}: {$sensor->modelId()})\n";
-            echo "  - Temp: {$sensor->temp()} C\n";
+            echo '  - Temp: ' . number_format($sensor->temp(), 1, '.', ' ') . "°C\n";
         }
     }
 }

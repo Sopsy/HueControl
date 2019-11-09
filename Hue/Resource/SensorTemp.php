@@ -10,7 +10,7 @@ final class SensorTemp extends Sensor
     public function __construct(int $id, string $name, string $type, string $modelId, float $temp)
     {
         parent::__construct($id, $name, $type, $modelId);
-        $this->temp = $temp/100;
+        $this->temp = round($temp/100, 1);
     }
 
     public function temp(): float
