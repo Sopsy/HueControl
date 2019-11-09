@@ -16,6 +16,8 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
 `php cli.php <bridge-ip> <username> <command> [...command arguments]`
 
 #### Supported commands
+- `CreateConfig`
+  - Try to autodetect Hue Bridge IP and create a user in it
 - `GetResourceLinks`
   - List resource links in the Hue Bridge
 - `GetLights`
