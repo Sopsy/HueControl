@@ -149,5 +149,13 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
+
+        $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} off-long", [
+            ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '4003'],
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
+        ], [
+            ['address' => '/groups/0/action', 'method' => 'PUT', 'body' => ['on' => false]],
+        ]);
+        echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 }
