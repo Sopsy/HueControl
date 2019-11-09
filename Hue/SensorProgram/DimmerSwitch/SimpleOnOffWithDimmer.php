@@ -41,7 +41,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
     {
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2000'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
@@ -52,7 +52,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-long", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2001'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
@@ -63,7 +63,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-rele", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '2003'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'bri_inc' => 0,
@@ -76,7 +76,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
     {
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3000'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
@@ -87,7 +87,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-long", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3001'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'transitiontime' => 9,
@@ -98,7 +98,7 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-rele", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '3003'],
-            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx']
+            ['address' => "/sensors/{$this->sensor->id()}/state/lastupdated", 'operator' => 'dx'],
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => [
                 'bri_inc' => 0,
