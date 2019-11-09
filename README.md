@@ -31,7 +31,9 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
 - `DeleteScene <scene id>`
   - Delete a scene with id `scene id`
 - `GetSensors`
-  - List sensors (buttons, motion sensors, flags, etc.) int he Hue Bridge
+  - List sensors (buttons, motion sensors, flags, etc.) in the Hue Bridge
+- `GetTemp`
+  - List temperature sensors and their values from the Hue Bridge
 - `DeleteUnusedMemorySensors`
   - Delete memory sensors (boolean and integer flags) that are not used by any rules
 - `ProgramSensor <sensor name> <group name> <program name>`

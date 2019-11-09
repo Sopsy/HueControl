@@ -7,8 +7,11 @@ use Hue\Contract\ApiInterface;
 use Hue\Contract\GroupInterface;
 use Hue\Group\SensorGroup;
 use Hue\Resource\Sensor;
+use Hue\Resource\SensorGeneric;
+use Hue\Resource\SensorTemp;
 use function in_array;
 use function uniqid;
+use function var_dump;
 
 final class SensorRepository
 {
@@ -22,10 +25,13 @@ final class SensorRepository
     public function getAll(): GroupInterface
     {
         $data = ($this->api->get('/sensors'))->data();
-
         $sensors = [];
         foreach ($data as $id => $sensor) {
-            $sensors[] = new Sensor((int)$id, $sensor->name, $sensor->type, $sensor->modelid);
+            if ($sensor->type === 'ZLLTemperature') {
+                $sensors[] = new SensorTemp((int)$id, $sensor->name, $sensor->type, $sensor->modelid, $sensor->state->temperature);
+            } else {
+                $sensors[] = new SensorGeneric((int)$id, $sensor->name, $sensor->type, $sensor->modelid);
+            }
         }
 
         return new SensorGroup(...$sensors);
@@ -57,7 +63,7 @@ final class SensorRepository
 
         $response = $this->api->post('/sensors/', $data);
 
-        return new Sensor((int)$response->data()->id, $name, $type, $modelId);
+        return new SensorGeneric((int)$response->data()->id, $name, $type, $modelId);
     }
 
     public function delete(int $id): void

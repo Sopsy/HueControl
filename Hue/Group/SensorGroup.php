@@ -25,6 +25,22 @@ final class SensorGroup implements GroupInterface
         return $this->items;
     }
 
+    public function allTemp(): array
+    {
+        $return = [];
+        foreach ($this->items AS $item) {
+            if ($item->type() === 'ZLLTemperature') {
+                $return[] = $item;
+            }
+        }
+
+        if (empty($return)) {
+            throw new RuntimeException('No temperature sensors found.');
+        }
+
+        return $return;
+    }
+
     public function byName($name): ResourceInterface
     {
         foreach ($this->items AS $item) {

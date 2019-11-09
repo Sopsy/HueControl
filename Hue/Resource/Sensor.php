@@ -5,12 +5,12 @@ namespace Hue\Resource;
 
 use Hue\Contract\TypedResourceInterface;
 
-final class Sensor implements TypedResourceInterface
+abstract class Sensor implements TypedResourceInterface
 {
-    private $id;
-    private $name;
-    private $type;
-    private $modelId;
+    protected $id;
+    protected $name;
+    protected $type;
+    protected $modelId;
 
     public function __construct(int $id, string $name, string $type, string $modelId)
     {
