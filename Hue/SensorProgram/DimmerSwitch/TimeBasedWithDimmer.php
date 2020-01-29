@@ -23,6 +23,12 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         $this->relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
         $this->nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
+        $this->addResourceLink($this->energize);
+        $this->addResourceLink($this->concentrate);
+        $this->addResourceLink($this->read);
+        $this->addResourceLink($this->relax);
+        $this->addResourceLink($this->nightlight);
+
         // Create rules
         $this->createRulesForOnButton();
         $this->createRulesForUpButton();
@@ -40,6 +46,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->energize->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // 11:00 - 17:00
@@ -50,6 +59,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // 17:00 - 20:00
@@ -60,6 +72,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->read->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // 20:00 - 23:00
@@ -70,6 +85,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->relax->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // 23:00 - 05:30
@@ -80,6 +98,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->nightlight->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // Long press = bright
@@ -89,6 +110,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->concentrate->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -104,6 +128,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
                 'bri_inc' => 25
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-press, all off", [
@@ -113,6 +140,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->relax->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -128,6 +158,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
                 'bri_inc' => -25
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-press, all off", [
@@ -137,6 +170,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $this->nightlight->id()]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -148,6 +184,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} off-long", [
@@ -156,6 +195,9 @@ final class TimeBasedWithDimmer extends AbstractDimmerSwitchProgram implements P
         ], [
             ['address' => '/groups/0/action', 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 }

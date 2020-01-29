@@ -15,7 +15,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
         // Create status flag for repeated presses
         $this->statusSensor = $this->sensorRepo->createStatus("Switch {$this->sensor->id()} status");
         echo "Created new memory status sensor: {$this->statusSensor->id()} ({$this->statusSensor->name()})\n";
-        
+
+        $this->addResourceLink($this->statusSensor);
+
         // Create rules
         $this->createRulesForOnButton();
         $this->createRulesForUpButton();
@@ -30,6 +32,10 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
         $relax = $scenes->byNameAndGroup('Relax', $this->groupOrLight->id());
         $nightlight = $scenes->byNameAndGroup('Nightlight', $this->groupOrLight->id());
 
+        $this->addResourceLink($concentrate);
+        $this->addResourceLink($relax);
+        $this->addResourceLink($nightlight);
+
         // On
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-press", [
             ['address' => "/sensors/{$this->sensor->id()}/state/buttonevent", 'operator' => 'eq', 'value' => '1000'],
@@ -39,6 +45,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => true]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // Status 1->2
@@ -51,6 +60,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 2]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // Status 2->3
@@ -63,6 +75,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 3]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         // Status 3->4
@@ -75,6 +90,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 1]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -89,6 +107,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => 30
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-long", [
@@ -100,6 +121,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => 56
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-rele", [
@@ -110,6 +134,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => 0
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -124,6 +151,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => -30
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-long", [
@@ -135,6 +165,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => -56
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-rele", [
@@ -145,6 +178,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
                 'bri_inc' => 0
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -157,6 +193,9 @@ final class SceneCycleWithDimmer extends AbstractDimmerSwitchProgram implements 
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
             ['address' => "/sensors/{$this->statusSensor->id()}/state", 'method' => 'PUT', 'body' => ['status' => 0]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 }

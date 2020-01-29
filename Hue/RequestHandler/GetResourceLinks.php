@@ -5,7 +5,9 @@ namespace Hue\RequestHandler;
 
 use Hue\Bridge;
 use Hue\Contract\RequestHandlerInterface;
-use Hue\Repository\ResourceLinkRepository;
+use Hue\Repository\ResourceLinksRepository;
+
+use function var_dump;
 
 final class GetResourceLinks implements RequestHandlerInterface
 {
@@ -20,7 +22,7 @@ final class GetResourceLinks implements RequestHandlerInterface
     {
         echo "Resource links in {$this->bridge->name()}:\n\n";
 
-        foreach ((new ResourceLinkRepository($this->bridge->api()))->getAll()->all() AS $resourceLink) {
+        foreach ((new ResourceLinksRepository($this->bridge->api()))->getAll()->all() AS $resourceLink) {
             echo "{$resourceLink->id()}: {$resourceLink->name()}\n";
             foreach ($resourceLink->links() as $link) {
                 echo "  - {$link}\n";

@@ -26,6 +26,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => ['on' => true]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} on-long", [
@@ -34,6 +37,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => ['bri' => 255, 'ct' => 300]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -48,6 +54,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => 30,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-long", [
@@ -59,6 +68,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => 56,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} up-rele", [
@@ -69,6 +81,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => 0,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -83,6 +98,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => -30,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-long", [
@@ -94,6 +112,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => -56,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} down-rele", [
@@ -104,6 +125,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
                 'bri_inc' => 0,
             ]]
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -115,6 +139,9 @@ final class SimpleOnOffWithDimmer extends AbstractDimmerSwitchProgram implements
         ], [
             ['address' => $this->groupOrLight->apiSetStateUrl(), 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 }

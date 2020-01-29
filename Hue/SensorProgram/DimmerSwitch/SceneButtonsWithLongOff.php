@@ -30,6 +30,10 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $concentrate->id()]],
         ]);
+
+        $this->addResourceLink($concentrate);
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -42,6 +46,10 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $relax->id()]],
         ]);
+
+        $this->addResourceLink($relax);
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -54,6 +62,10 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['scene' => $nightlight->id()]],
         ]);
+
+        $this->addResourceLink($nightlight);
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 
@@ -65,6 +77,9 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
         ], [
             ['address' => "/groups/{$this->groupOrLight->id()}/action", 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
 
         $rule = $this->ruleRepo->create("Switch {$this->sensor->id()} off-long", [
@@ -73,6 +88,9 @@ final class SceneButtonsWithLongOff extends AbstractDimmerSwitchProgram implemen
         ], [
             ['address' => '/groups/0/action', 'method' => 'PUT', 'body' => ['on' => false]],
         ]);
+
+        $this->addResourceLink($rule);
+
         echo "Created new rule: {$rule->id()} ({$rule->name()})\n";
     }
 }

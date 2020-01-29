@@ -4,15 +4,17 @@ declare(strict_types=1);
 namespace Hue\SensorProgram;
 
 use Hue\Contract\ApiInterface;
+use Hue\Contract\ResourceInterface;
 use Hue\Repository\GroupRepository;
 use Hue\Repository\LightRepository;
-use Hue\Repository\ResourceLinkRepository;
+use Hue\Repository\ResourceLinksRepository;
 use Hue\Repository\RuleRepository;
 use Hue\Repository\SensorRepository;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use function in_array;
+use function var_dump;
 
 abstract class AbstractSensorProgram
 {
@@ -23,6 +25,7 @@ abstract class AbstractSensorProgram
     protected $sensorRepo;
     protected $singleLight;
     protected $supportsSingleLight = false;
+    private $resourceLinks = [];
 
     /**
      * AbstractSensorProgram constructor.
@@ -68,20 +71,24 @@ abstract class AbstractSensorProgram
 
         echo 'Installing program ' . (new ReflectionClass($this))->getShortName() . " to '{$sensorName}' to control group or light '{$groupName}'...\n";
 
-        $this->removeOldRules();
+        $this->addResourceLink($this->groupOrLight);
+        $this->addResourceLink($this->sensor);
 
+        $this->removeOldRules();
         $this->apply();
+        $this->storeResourceLinks();
     }
 
-    protected function removeOldRules(): void
+    private function removeOldRules(): void
     {
         echo "Deleting old rules and resource links for '{$this->sensor->name()}'...\n";
 
         $ruleRepo = new RuleRepository($this->api);
-        $resourceLinkRepo = new ResourceLinkRepository($this->api);
+        $resourceLinkRepo = new ResourceLinksRepository($this->api);
 
         // Remove resource links
         $resourceLinks = $resourceLinkRepo->getAll();
+        var_dump($this->sensor->name());
         if ($resourceLinks->nameExists($this->sensor->name())) {
             $links = $resourceLinks->byName($this->sensor->name());
             $resourceLinkRepo->delete($links->id());
@@ -103,6 +110,19 @@ abstract class AbstractSensorProgram
                 }
             }
         }
+    }
+
+    private function storeResourceLinks(): void
+    {
+        $resourceLinks = (new ResourceLinksRepository($this->api))->create($this->sensor->name(),
+            "Rules for sensor {$this->sensor->id()}", 3, $this->resourceLinks);
+
+        echo "Created resource links: {$resourceLinks->id()} ({$resourceLinks->name()})\n";
+    }
+
+    protected function addResourceLink(ResourceInterface $resource): void
+    {
+        $this->resourceLinks[] = $resource;
     }
 
     abstract protected function sensorIsCompatible(): bool;

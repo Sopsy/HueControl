@@ -11,14 +11,14 @@ final class ResourceLinks implements TypedResourceInterface
 {
     private $id;
     private $name;
-    private $type;
+    private $classId;
     private $links;
 
-    public function __construct(int $id, string $name, string $type, array $links)
+    public function __construct(int $id, string $name, int $classId, array $links)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->type = $type;
+        $this->classId = $classId;
         $this->links = $links;
     }
 
@@ -34,7 +34,12 @@ final class ResourceLinks implements TypedResourceInterface
 
     public function type(): string
     {
-        return $this->type;
+        return 'Link';
+    }
+
+    public function classId(): int
+    {
+        return $this->classId;
     }
 
     public function links(): array

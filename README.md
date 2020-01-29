@@ -28,8 +28,10 @@ First create a username with `http://<bridge-ip>/debug/clip.html`
   - List rules in the Hue Bridge
 - `GetScenes [room name]`
   - List all scenes in the Hue Bridge for all rooms or in `room name`
-- `DeleteScene <scene id>`
-  - Delete a scene with id `scene id`
+- `DeleteScene <id>`
+  - Delete a scene with id `id`
+- `DeleteResourceLinks <id>`
+  - Delete resource links with id `id`
 - `GetSensors`
   - List sensors (buttons, motion sensors, flags, etc.) in the Hue Bridge
 - `GetTemp`
