@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace Hue\Contract;
 
-interface GroupInterface
+interface GroupInterface extends TypedResourceInterface, HasState
 {
-    public function idExists($id): bool;
-
-    public function byId($id): ResourceInterface;
-
-    public function nameExists($name): bool;
-
-    public function byName($name): ResourceInterface;
+    public function class(): string;
 
     /**
-     * @return ResourceInterface[]
+     * @return LightInterface[]
      */
-    public function all(): array;
+    public function lights(): array;
+
+    /**
+     * @return SceneInterface[]
+     */
+    public function scenes(): array;
 }

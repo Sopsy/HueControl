@@ -4,32 +4,38 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
-use Hue\Contract\GroupInterface;
 use Hue\Contract\ResourceInterface;
-use Hue\Group\ResourceLinksGroup;
-use Hue\Group\RuleGroup;
+use Hue\Contract\ResourceLinksInterface;
 use Hue\Resource\ResourceLinks;
-use Hue\Resource\Rule;
 
 final class ResourceLinksRepository
 {
-    private $api;
-
-    public function __construct(ApiInterface $api)
+    public function __construct(private ApiInterface $api)
     {
-        $this->api = $api;
     }
 
-    public function getAll(): GroupInterface
+    /**
+     * @return ResourceLinksInterface[]
+     */
+    public function all(): array
     {
-        $data = ($this->api->get('/resourcelinks'))->data();
+        $data = $this->api->get('/resourcelinks');
 
-        $links = [];
-        foreach ($data as $id => $link) {
-            $links[] = new ResourceLinks((int)$id, $link->name, $link->classid, $link->links);
+        $return = [];
+        foreach ($data->response() as $id => $link) {
+            $return[] = new ResourceLinks((int)$id, $link->name, (int)$link->classid, $link->links);
         }
 
-        return new ResourceLinksGroup(...$links);
+        return $return;
+    }
+
+    public function byId(int $id): ResourceLinksInterface
+    {
+        $data = $this->api->get("/resourcelinks/{$id}");
+
+        $link = $data->response();
+
+        return new ResourceLinks($id, $link->name, (int)$link->classid, $link->links);
     }
 
     /**
@@ -37,9 +43,9 @@ final class ResourceLinksRepository
      * @param string $description
      * @param int $classId
      * @param ResourceInterface[] $links
-     * @return ResourceLinks
+     * @return ResourceLinksInterface
      */
-    public function create(string $name, string $description, int $classId, array $links): ResourceLinks
+    public function create(string $name, string $description, int $classId, array $links): ResourceLinksInterface
     {
         $resourceLinks = [];
         foreach ($links as $link) {
@@ -56,7 +62,7 @@ final class ResourceLinksRepository
 
         $response = $this->api->post('/resourcelinks', $data);
 
-        return new ResourceLinks((int)$response->data()->id, $name, $classId, $links);
+        return new ResourceLinks((int)$response->response()->success->id, $name, $classId, $links);
     }
 
     public function delete(int $id): void

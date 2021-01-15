@@ -4,29 +4,25 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
-use Hue\Contract\GroupInterface;
-use Hue\Group\RuleGroup;
 use Hue\Resource\Rule;
+use function var_dump;
 
 final class RuleRepository
 {
-    private $api;
-
-    public function __construct(ApiInterface $api)
+    public function __construct(private ApiInterface $api)
     {
-        $this->api = $api;
     }
 
-    public function getAll(): GroupInterface
+    public function all(): array
     {
-        $data = ($this->api->get('/rules'))->data();
+        $data = $this->api->get('/rules');
 
-        $rules = [];
-        foreach ($data as $id => $rule) {
-            $rules[] = new Rule((int)$id, $rule->name, $rule->conditions, $rule->actions);
+        $return = [];
+        foreach ($data->response() as $id => $rule) {
+            $return[] = new Rule((int)$id, $rule->name, $rule->conditions, $rule->actions);
         }
 
-        return new RuleGroup(...$rules);
+        return $return;
     }
 
     public function create(string $name, array $conditions, array $actions): Rule
@@ -40,7 +36,7 @@ final class RuleRepository
 
         $response = $this->api->post('/rules', $data);
 
-        return new Rule((int)$response->data()->id, $name, $conditions, $actions);
+        return new Rule((int)$response->response()->success->id, $name, $conditions, $actions);
     }
 
     public function delete(int $id): void

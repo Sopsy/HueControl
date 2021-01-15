@@ -4,44 +4,56 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
-use Hue\Contract\GroupInterface;
-use Hue\Group\ScheduleGroup;
 use Hue\Resource\Schedule;
+use function json_encode;
 
 final class ScheduleRepository
 {
-    private $api;
-
-    public function __construct(ApiInterface $api)
+    public function __construct(private ApiInterface $api)
     {
-        $this->api = $api;
     }
 
-    public function getAll(): GroupInterface
+    public function all(): array
     {
-        $data = ($this->api->get('/schedules'))->data();
+        $data = $this->api->get('/schedules');
 
-        $sensors = [];
-        foreach ($data as $id => $sensor) {
-            $sensors[] = new Schedule((int)$id, $sensor->name);
+        $return = [];
+        foreach ($data->response() as $id => $schedule) {
+            $return[] = new Schedule(
+                (int)$id,
+                $schedule->name,
+                $schedule->description,
+                json_encode($schedule->command, JSON_THROW_ON_ERROR),
+                $schedule->localtime,
+                $schedule->time,
+                $schedule->status
+            );
         }
 
-        return new ScheduleGroup(...$sensors);
+        return $return;
     }
 
-    public function create(string $name, string $command, string $time, bool $autodelete = true): Schedule
+    public function create(string $name, string $command, string $time, bool $autoDelete = true): Schedule
     {
         $data = [
             'name' => $name,
             'command' => $command,
             'localtime' => $time,
-            'autodelete' => $autodelete,
+            'autodelete' => $autoDelete,
             'recycle' => true,
         ];
 
         $response = $this->api->post('/schedules/', $data);
 
-        return new Schedule((int)$response->data()->id, $name);
+        return new Schedule(
+            (int)$response->response()->id,
+            $name,
+            $response->response()->description ?? '',
+            $command,
+            $time,
+            $response->response()->time ?? '',
+            $response->response()->status ?? 'enabled'
+        );
     }
 
     public function delete(int $id): void

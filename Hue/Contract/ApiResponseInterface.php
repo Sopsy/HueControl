@@ -11,5 +11,5 @@ interface ApiResponseInterface
 
     public function message(): string;
 
-    public function data(): stdClass;
+    public function response(): stdClass;
 }

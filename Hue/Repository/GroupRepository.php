@@ -4,58 +4,45 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
-use Hue\Contract\GroupInterface;
-use Hue\Group\GroupGroup;
-use Hue\Group\LightGroup;
-use Hue\Group\SceneGroup;
 use Hue\Resource\Group;
-use Hue\Resource\Light;
-use Hue\Resource\Scene;
 
 final class GroupRepository
 {
-    private $api;
-
-    public function __construct(ApiInterface $api)
+    public function __construct(private ApiInterface $api)
     {
-        $this->api = $api;
     }
 
-    public function getAll(): GroupInterface
+    /**
+     * @return Group[]
+     */
+    public function all(): array
     {
-        $groups = ($this->api->get('/groups'))->data();
-        $lights = ($this->api->get('/lights'))->data();
-        $scenes = ($this->api->get('/scenes'))->data();
+        $groups = $this->api->get('/groups')->response();
+        $lights = new LightRepository($this->api);
+        $scenes = new SceneRepository($this->api);
 
-        $groupGroups = [];
-        foreach ($groups AS $groupId => $group) {
+        $return = [];
+        foreach ($groups as $groupId => $group) {
             $groupLights = [];
-            foreach ($group->lights AS $lightId) {
-                $groupLights[] = new Light(
-                    (int)$lightId,
-                    $lights->$lightId->name,
-                    $lights->$lightId->type,
-                    $lights->$lightId->modelid,
-                    $lights->$lightId->capabilities->control->colorgamuttype,
-                    $lights->$lightId->manufacturername,
-                    $lights->$lightId->productname
-                );
+            foreach ($group->lights as $lightId) {
+                $groupLights[(int)$lightId] = $lights->byId((int)$lightId);
             }
-            $groupLights = new LightGroup(...$groupLights);
 
-            $groupScenes = [];
-            foreach ($scenes AS $sceneId => $scene) {
-                if ($scene->type !== 'GroupScene' || $scene->group !== $groupId) {
-                    continue;
-                }
-
-                $groupScenes[] = new Scene($sceneId, $scene->name, $scene->type, (int)$scene->group);
-            }
-            $groupScenes = new SceneGroup(...$groupScenes);
-
-            $groupGroups[(int)$groupId] = new Group((int)$groupId, $group->name, $group->type, $group->class, $groupLights, $groupScenes);
+            $return[(int)$groupId] = new Group(
+                (int)$groupId,
+                $group->name,
+                $group->type,
+                $group->class,
+                $groupLights,
+                $scenes->byGroupId((int)$groupId)
+            );
         }
 
-        return new GroupGroup(...$groupGroups);
+        return $return;
+    }
+
+    public function byId(int $id): Group
+    {
+
     }
 }

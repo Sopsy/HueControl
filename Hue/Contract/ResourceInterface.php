@@ -5,10 +5,8 @@ namespace Hue\Contract;
 
 interface ResourceInterface
 {
-    /**
-     * @return int|string
-     */
-    public function id();
+    // Scene IDs are a string, others int
+    public function id(): int|string;
 
     public function name(): string;
 

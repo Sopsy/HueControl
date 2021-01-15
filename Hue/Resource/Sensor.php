@@ -3,21 +3,16 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\TypedResourceInterface;
+use Hue\Contract\SensorInterface;
 
-abstract class Sensor implements TypedResourceInterface
+final class Sensor implements SensorInterface
 {
-    protected $id;
-    protected $name;
-    protected $type;
-    protected $modelId;
-
-    public function __construct(int $id, string $name, string $type, string $modelId)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->type = $type;
-        $this->modelId = $modelId;
+    public function __construct(
+        private int $id,
+        private string $name,
+        private string $type,
+        private string $modelId
+    ) {
     }
 
     public function id(): int
@@ -35,7 +30,7 @@ abstract class Sensor implements TypedResourceInterface
         return $this->type;
     }
 
-    public function modelId(): string
+    public function model(): string
     {
         return $this->modelId;
     }
@@ -43,5 +38,10 @@ abstract class Sensor implements TypedResourceInterface
     public function apiUrl(): string
     {
         return "/sensors/{$this->id()}";
+    }
+
+    public function apiStateUrl(): string
+    {
+        return "{$this->apiUrl()}/state";
     }
 }

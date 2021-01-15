@@ -3,21 +3,16 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\TypedResourceInterface;
+use Hue\Contract\SceneInterface;
 
-final class Scene implements TypedResourceInterface
+final class Scene implements SceneInterface
 {
-    private $id;
-    private $name;
-    private $type;
-    private $group;
-
-    public function __construct(string $id, string $name, string $type, int $group)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->type = $type;
-        $this->group = $group;
+    public function __construct(
+        private string $id,
+        private string $name,
+        private string $type,
+        private int $group
+    ) {
     }
 
     public function id(): string

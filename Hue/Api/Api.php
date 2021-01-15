@@ -5,6 +5,8 @@ namespace Hue\Api;
 
 use Hue\Contract\ApiInterface;
 use Hue\Contract\ApiResponseInterface;
+use Hue\Contract\ConfigInterface;
+use JsonException;
 use RuntimeException;
 use function curl_close;
 use function curl_exec;
@@ -17,16 +19,12 @@ use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const JSON_THROW_ON_ERROR;
 
 final class Api implements ApiInterface
 {
-    private $bridgeIp;
-    private $username;
-
-    public function __construct(string $bridgeIp, string $username)
+    public function __construct(private ConfigInterface $config)
     {
-        $this->bridgeIp = $bridgeIp;
-        $this->username = $username;
     }
 
     public function get(string $url): ApiResponseInterface
@@ -51,56 +49,36 @@ final class Api implements ApiInterface
 
     private function curl(string $method, string $url, array $data = []): ApiResponseInterface
     {
-        $ch = curl_init('http://' . $this->bridgeIp . '/api/' . $this->username . $url);
+        $ch = curl_init('http://' . $this->config->bridgeIp() . '/api/' . $this->config->username() . $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        switch ($method) {
-            case 'GET':
-                break;
-            case 'POST':
-                curl_setopt($ch, CURLOPT_POST, true);
+        if ($method === 'POST' || $method === 'PUT') {
+            try {
+                $payload = json_encode($data, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                throw new RuntimeException('JSON encoding payload data failed', 1, $e);
+            }
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
-                $payload = json_encode($data);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($payload)
+            ]);
+        }
 
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen($payload)
-                ]);
-
-                break;
-            case 'PUT':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-
-                $payload = json_encode($data);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen($payload)
-                ]);
-
-                break;
-            case 'DELETE':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-                break;
-            default:
-                throw new RuntimeException("Invalid request method {$method}.");
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+        } elseif ($method === 'PUT' || $method === 'DELETE') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         }
 
         $response = curl_exec($ch);
-
         curl_close($ch);
 
-        $this->checkResponse($response);
+        if ($response === false) {
+            throw new RuntimeException('Could not get a response from Hue API.');
+        }
 
         return new ApiResponse($response);
-    }
-
-    private function checkResponse($response): void
-    {
-        if ($response === false) {
-            throw new RuntimeException('Could not get a response from Hue API, curl returned false.');
-        }
     }
 }

@@ -4,47 +4,74 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
-use Hue\Contract\GroupInterface;
-use Hue\Group\SensorGroup;
+use Hue\Contract\SensorInterface;
 use Hue\Resource\Sensor;
-use Hue\Resource\SensorGeneric;
-use Hue\Resource\SensorTemp;
+use Hue\Resource\TempSensor;
+use InvalidArgumentException;
+use stdClass;
 use function in_array;
 use function uniqid;
-use function var_dump;
 
 final class SensorRepository
 {
-    private $api;
+    public const TYPE_SWITCH = 'ZLLSwitch';
+    public const TYPE_TAP_SWITCH = 'ZGPSwitch';
+    public const TYPE_PRESENCE = 'ZLLPresence';
+    public const TYPE_TEMP = 'ZLLTemperature';
+    public const TYPE_LIGHT_LEVEL = 'ZLLLightLevel';
+    public const TYPE_GENERIC_STATUS = 'CLIPGenericStatus';
+    public const TYPE_GENERIC_FLAG = 'CLIPGenericFlag';
 
-    public function __construct(ApiInterface $api)
+    public function __construct(private ApiInterface $api)
     {
-        $this->api = $api;
     }
 
-    public function getAll(): GroupInterface
+    /**
+     * @param string $type
+     * @return SensorInterface[]
+     */
+    public function all(string $type = ''): array
     {
-        $data = ($this->api->get('/sensors'))->data();
-        $sensors = [];
-        foreach ($data as $id => $sensor) {
-            if ($sensor->type === 'ZLLTemperature') {
-                $sensors[] = new SensorTemp((int)$id, $sensor->name, $sensor->type, $sensor->modelid, $sensor->state->temperature);
-            } else {
-                $sensors[] = new SensorGeneric((int)$id, $sensor->name, $sensor->type, $sensor->modelid);
+        $data = $this->api->get('/sensors');
+
+        $return = [];
+        foreach ($data->response() as $id => $sensor) {
+            if ($type !== '' && $sensor->type !== $type) {
+                continue;
+            }
+
+            $return[(int)$id] = $this->createObject((int)$id, $sensor);
+        }
+
+        return $return;
+    }
+
+    public function byName(string $name = ''): SensorInterface
+    {
+        foreach ($this->all() as $id => $sensor) {
+            if ($sensor->name() === $name) {
+                return $sensor;
             }
         }
 
-        return new SensorGroup(...$sensors);
+        throw new InvalidArgumentException("Sensor {$name} not found");
+    }
+
+    public function byId(int $id): SensorInterface
+    {
+        $data = $this->api->get("/sensors/{$id}");
+
+        return $this->createObject($id, $data->response());
     }
 
     public function createStatus(string $name): Sensor
     {
-        return $this->createMemory($name, 'CLIPGenericStatus');
+        return $this->createMemory($name, self::TYPE_GENERIC_STATUS);
     }
 
     public function createFlag(string $name): Sensor
     {
-        return $this->createMemory($name, 'CLIPGenericFlag');
+        return $this->createMemory($name, self::TYPE_GENERIC_FLAG);
     }
 
     private function createMemory(string $name, string $type): Sensor
@@ -63,7 +90,7 @@ final class SensorRepository
 
         $response = $this->api->post('/sensors/', $data);
 
-        return new SensorGeneric((int)$response->data()->id, $name, $type, $modelId);
+        return new Sensor((int)$response->response()->id, $name, $type, $modelId);
     }
 
     public function delete(int $id): void
@@ -77,14 +104,15 @@ final class SensorRepository
         $sensorRepo = new SensorRepository($this->api);
 
         $unusedSensors = [];
-        foreach ($sensorRepo->getAll()->all() as $sensor) {
-            if (in_array($sensor->type(), ['CLIPGenericStatus', 'CLIPGenericFlag'])) {
+        foreach ($sensorRepo->all() as $sensor) {
+            if (in_array($sensor->type(), [self::TYPE_GENERIC_STATUS, self::TYPE_GENERIC_FLAG], true)) {
                 $unusedSensors[$sensor->id()] = $sensor;
             }
         }
 
+        $rules = $ruleRepo->all();
         foreach ($unusedSensors as $sensorId => $sensor) {
-            foreach ($ruleRepo->getAll()->all() as $rule) {
+            foreach ($rules as $rule) {
                 foreach ($rule->conditions() as $condition) {
                     if ($condition->address === "/sensors/{$sensorId}/state/status") {
                         unset($unusedSensors[$sensorId]);
@@ -98,5 +126,17 @@ final class SensorRepository
             $this->delete($sensorId);
             echo "Deleted unused sensor: {$sensor->id()} ({$sensor->name()})\n";
         }
+    }
+
+    private function createObject(int $id, stdClass $sensor): SensorInterface
+    {
+        $return = new Sensor($id, $sensor->name, $sensor->type, $sensor->modelid);
+
+        $return = match ($sensor->type) {
+            self::TYPE_TEMP => new TempSensor($return, $sensor->manufacturername, $sensor->productname, $sensor->state->temperature),
+            default => $return,
+        };
+
+        return $return;
     }
 }

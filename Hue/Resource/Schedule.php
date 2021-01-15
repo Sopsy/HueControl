@@ -3,17 +3,45 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\ResourceInterface;
+use Hue\Contract\ScheduleInterface;
 
-final class Schedule implements ResourceInterface
+final class Schedule implements ScheduleInterface
 {
-    private $id;
-    private $name;
-
-    public function __construct(int $id, string $name)
+    public function __construct(
+        private int $id,
+        private string $name,
+        private string $description,
+        private string $command,
+        private string $localTime,
+        private string $time,
+        private string $status,
+    )
     {
-        $this->id = $id;
-        $this->name = $name;
+    }
+
+    public function description(): string
+    {
+        return $this->description;
+    }
+
+    public function command(): string
+    {
+        return $this->command;
+    }
+
+    public function localTime(): string
+    {
+        return $this->localTime;
+    }
+
+    public function time(): string
+    {
+        return $this->time;
+    }
+
+    public function status(): string
+    {
+        return $this->status;
     }
 
     public function id(): int

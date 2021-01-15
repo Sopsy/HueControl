@@ -3,59 +3,38 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\HasGamut;
-use Hue\Contract\HasModel;
-use Hue\Contract\HasSetStateUrl;
-use Hue\Contract\IsProduct;
-use Hue\Contract\TypedResourceInterface;
+use Hue\Contract\LightInterface;
+use Hue\Contract\SensorInterface;
 
-final class Light implements TypedResourceInterface, HasModel, HasGamut, IsProduct, HasSetStateUrl
+final class Light implements LightInterface
 {
-    private $id;
-    private $name;
-    private $type;
-    private $model;
-    private $gamutType;
-    private $manufacturer;
-    private $productName;
-
     public function __construct(
-        int $id,
-        string $name,
-        string $type,
-        string $model,
-        string $gamutType,
-        string $manufacturer,
-        string $productName
+        private SensorInterface $sensor,
+        private string $manufacturer,
+        private string $productName,
+        private string $gamutType,
     )
     {
-        $this->id = $id;
-        $this->name = $name;
-        $this->type = $type;
-        $this->model = $model;
-        $this->gamutType = $gamutType;
-        $this->manufacturer = $manufacturer;
-        $this->productName = $productName;
     }
 
     public function id(): int
     {
-        return $this->id;
+        return $this->sensor->id();
     }
 
     public function name(): string
     {
-        return $this->name;
+        return $this->sensor->name();
     }
 
     public function type(): string
     {
-        return $this->type;
+        return $this->sensor->type();
     }
 
     public function model(): string
     {
-        return $this->model;
+        return $this->sensor->model();
     }
 
     public function gamutType(): string
@@ -78,7 +57,7 @@ final class Light implements TypedResourceInterface, HasModel, HasGamut, IsProdu
         return "/lights/{$this->id()}";
     }
 
-    public function apiSetStateUrl(): string
+    public function apiStateUrl(): string
     {
         return "{$this->apiUrl()}/state";
     }

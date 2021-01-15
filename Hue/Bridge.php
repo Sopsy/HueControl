@@ -5,25 +5,22 @@ namespace Hue;
 
 use Hue\Api\Api;
 use Hue\Contract\ApiInterface;
+use Hue\Contract\ConfigInterface;
 use InvalidArgumentException;
 use const FILTER_VALIDATE_IP;
 
 final class Bridge
 {
-    private $user;
-    private $ip;
-    private $name;
-    private $api;
+    private string $name;
+    private ApiInterface $api;
 
-    public function __construct(string $bridgeIp, string $user)
+    public function __construct(private ConfigInterface $config)
     {
-        if (!filter_var($bridgeIp, FILTER_VALIDATE_IP)) {
+        if (!filter_var($this->config->bridgeIp(), FILTER_VALIDATE_IP)) {
             throw new InvalidArgumentException('Invalid bridge IP');
         }
 
-        $this->user = $user;
-        $this->ip = $bridgeIp;
-        $this->api = new Api($this->ip, $this->user);
+        $this->api = new Api($this->config);
 
         $data = ($this->api->get('/config'))->response();
         $this->name = $data->name;

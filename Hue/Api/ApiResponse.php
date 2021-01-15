@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hue\Api;
 
 use Hue\Contract\ApiResponseInterface;
+use JsonException;
 use RuntimeException;
 use stdClass;
 use function is_array;
@@ -12,50 +13,39 @@ use function ob_get_clean;
 
 final class ApiResponse implements ApiResponseInterface
 {
-    private $response;
+    private stdClass $response;
 
-    public function __construct(string $response)
+    public function __construct(string $responseString)
     {
-        $response = json_decode($response, false);
+        try {
+            $response = json_decode($responseString, false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new RuntimeException('Decoding API response JSON failed', 1, $e);
+        }
 
-        // Why? I don't know.
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         if (is_array($response)) {
             $response = $response[0];
         }
 
-        if (isset($response->error)) {
-            throw new RuntimeException('Error from Hue API: ' . $response->error->description);
-        }
-
         $this->response = $response;
+
+        if (!$this->success()) {
+            throw new RuntimeException('Error from Hue API: ' . $this->message());
+        }
     }
 
     public function success(): bool
     {
-        if (isset($this->response->error)) {
-            return false;
-        }
-
-        if (isset($this->response->success)) {
-            return true;
-        }
-
-        return true;
+        return !isset($this->response->error);
     }
 
     public function message(): string
     {
-        if (isset($this->response->error)) {
+        if (!$this->success()) {
             return $this->response->error->description;
         }
 
         return $this->response->success ?? '';
-    }
-
-    public function data(): stdClass
-    {
-        return $this->response->success ?? $this->response;
     }
 
     public function response(): stdClass
@@ -63,12 +53,12 @@ final class ApiResponse implements ApiResponseInterface
         return $this->response;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         ob_start();
 
         var_dump($this->response);
 
-        return ob_get_clean();
+        return (string)ob_get_clean();
     }
 }

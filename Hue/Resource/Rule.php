@@ -3,21 +3,17 @@ declare(strict_types=1);
 
 namespace Hue\Resource;
 
-use Hue\Contract\ResourceInterface;
+use Hue\Contract\RuleInterface;
 
-final class Rule implements ResourceInterface
+final class Rule implements RuleInterface
 {
-    private $id;
-    private $name;
-    private $conditions;
-    private $actions;
-
-    public function __construct(int $id, string $name, array $conditions, array $actions)
+    public function __construct(
+        private int $id,
+        private string $name,
+        private array $conditions,
+        private array $actions
+    )
     {
-        $this->id = $id;
-        $this->name = $name;
-        $this->conditions = $conditions;
-        $this->actions = $actions;
     }
 
     public function id(): int
