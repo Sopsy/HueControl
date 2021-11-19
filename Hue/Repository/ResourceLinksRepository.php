@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
+use Hue\Contract\ApiResponseInterface;
 use Hue\Contract\ResourceInterface;
 use Hue\Contract\ResourceLinksInterface;
 use Hue\Resource\ResourceLinks;
@@ -31,9 +32,7 @@ final class ResourceLinksRepository
 
     public function byId(int $id): ResourceLinksInterface
     {
-        $data = $this->api->get("/resourcelinks/{$id}");
-
-        $link = $data->response();
+        $link = $this->api->get("/resourcelinks/{$id}")->response();
 
         return new ResourceLinks($id, $link->name, (int)$link->classid, $link->links);
     }
@@ -62,11 +61,11 @@ final class ResourceLinksRepository
 
         $response = $this->api->post('/resourcelinks', $data);
 
-        return new ResourceLinks((int)$response->response()->success->id, $name, $classId, $links);
+        return new ResourceLinks((int)$response->response()->id, $name, $classId, $links);
     }
 
-    public function delete(int $id): void
+    public function delete(int $id): ApiResponseInterface
     {
-        $this->api->delete('/resourcelinks/' . $id);
+        return $this->api->delete('/resourcelinks/' . $id);
     }
 }

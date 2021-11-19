@@ -10,6 +10,9 @@ use stdClass;
 use function is_array;
 use function json_decode;
 use function ob_get_clean;
+use function ob_start;
+use function var_dump;
+use const JSON_THROW_ON_ERROR;
 
 final class ApiResponse implements ApiResponseInterface
 {
@@ -50,7 +53,7 @@ final class ApiResponse implements ApiResponseInterface
 
     public function response(): stdClass
     {
-        return $this->response;
+        return $this->response->success ?? $this->response;
     }
 
     public function __toString(): string

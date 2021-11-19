@@ -25,7 +25,8 @@ unset($argv[0]);
 try {
     new Bootstrap($config, ...$argv);
 } catch (Throwable $e) {
-    echo "{$e->getMessage()}";
+    echo "\n\nRuntime error in {$e->getFile()}, line {$e->getLine()}:\n";
+    echo $e->getMessage();
 }
 
 echo "\n";

@@ -71,13 +71,11 @@ final class SceneRepository
             }
         }
 
-        throw new InvalidArgumentException("Scehe {$name} not found in group {$group}");
+        throw new InvalidArgumentException("Scene {$name} not found in group {$group->name()}");
     }
 
     public function delete(string $id): void
     {
-        $result = $this->api->delete('/scenes/' . $id);
-
-        echo $result;
+        echo $this->api->delete('/scenes/' . $id);
     }
 }

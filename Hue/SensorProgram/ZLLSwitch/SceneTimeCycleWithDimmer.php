@@ -72,7 +72,7 @@ final class SceneTimeCycleWithDimmer implements ProgramInterface
             (new SceneShortPress($this->sensor, new SwitchDown(), $this->group, $nightlight))->rules(),
             (new OffPress($this->sensor, new SwitchOff(), $this->group))->rules(),
             (new LongPressAllOff($this->sensor, new SwitchOff()))->rules(),
-            (new StatusSensorReset($this->sensor, new SwitchOff(), $statusSensor)),
+            (new StatusSensorReset($this->sensor, new SwitchOff(), $statusSensor))->rules(),
         );
     }
 

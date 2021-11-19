@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Hue\Repository;
 
 use Hue\Contract\ApiInterface;
+use Hue\Contract\ApiResponseInterface;
 use Hue\Resource\Rule;
-use function var_dump;
 
 final class RuleRepository
 {
@@ -36,11 +36,11 @@ final class RuleRepository
 
         $response = $this->api->post('/rules', $data);
 
-        return new Rule((int)$response->response()->success->id, $name, $conditions, $actions);
+        return new Rule((int)$response->response()->id, $name, $conditions, $actions);
     }
 
-    public function delete(int $id): void
+    public function delete(int $id): ApiResponseInterface
     {
-        $this->api->delete('/rules/' . $id);
+        return $this->api->delete('/rules/' . $id);
     }
 }

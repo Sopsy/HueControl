@@ -52,15 +52,15 @@ final class SceneCycle implements ProgramRulesInterface
 
             $return[] = new Rule(
                 0,
-                "Switch {$this->sensor->id()} {$this->button->name()}-press cycle-{$i}}",
+                "Switch {$this->sensor->id()} {$this->button->name()}-press cycle-{$i}",
                 [
                     ['address' => "{$this->sensor->apiStateUrl()}/buttonevent", 'operator' => 'eq', 'value' => $this->button->shortReleaseEvent()],
                     ['address' => "{$this->sensor->apiStateUrl()}/lastupdated", 'operator' => 'dx'],
                     ['address' => "{$this->group->apiStateUrl()}/any_on", 'operator' => 'eq', 'value' => 'true'],
-                    ['address' => "{$this->statusSensor->apiStateUrl()}/status", 'operator' => 'eq', 'value' => $i],
+                    ['address' => "{$this->statusSensor->apiStateUrl()}/status", 'operator' => 'eq', 'value' => (string)$i],
                 ], [
                     ['address' => "{$this->group->apiUrl()}/action", 'method' => 'PUT', 'body' => ['scene' => $scene->id()]],
-                    ['address' => "{$this->statusSensor->apiStateUrl()}", 'method' => 'PUT', 'body' => ['status' => $next]],
+                    ['address' => $this->statusSensor->apiStateUrl(), 'method' => 'PUT', 'body' => ['status' => $next]],
                 ]
             );
 

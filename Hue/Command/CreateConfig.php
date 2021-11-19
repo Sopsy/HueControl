@@ -95,7 +95,7 @@ final class CreateConfig implements CommandInterface
                 'bridgeIp' => $this->bridgeIp,
                 'username' => $this->getUsername(),
             ], JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
+        } catch (JsonException) {
             throw new RuntimeException('');
         }
 
@@ -108,12 +108,12 @@ final class CreateConfig implements CommandInterface
     {
         echo "Please push the link button in the Hue bridge now.\n";
         echo "Press Enter to continue...\n";
+        /** @noinspection UnusedFunctionResultInspection */
         fgets(STDIN);
         echo "Connecting to bridge...\n";
 
-        $api = new Api(new CustomConfig($this->bridgeIp, ''));
-        $response = $api->post('', ['devicetype' => 'Sopsy/HueControl']);
+        $response = (new Api(new CustomConfig($this->bridgeIp, '')))->post('', ['devicetype' => 'Sopsy/HueControl']);
 
-        return $response->data()->username;
+        return $response->response()->username;
     }
 }

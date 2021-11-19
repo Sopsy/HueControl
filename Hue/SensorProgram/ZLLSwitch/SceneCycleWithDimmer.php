@@ -59,13 +59,12 @@ final class SceneCycleWithDimmer implements ProgramInterface
         $statusSensor = (new SensorRepository($this->api))->createStatus("Switch {$this->sensor->id()} cycle status");
         $this->resourceLinks[] = $statusSensor;
 
-        $offButton = new SwitchOff();
         return array_merge(
-            (new SceneCycle($this->sensor, new SwitchOn(), $this->group, $statusSensor, $concentrate, $relax, $nightlight)),
+            (new SceneCycle($this->sensor, new SwitchOn(), $this->group, $statusSensor, $concentrate, $relax, $nightlight))->rules(),
             (new Dimmer($this->sensor, new SwitchUp(), $this->group, 30, 56))->rules(),
             (new Dimmer($this->sensor, new SwitchDown(), $this->group, -30, -56))->rules(),
-            (new OffPress($this->sensor, new SwitchOff(), $this->group)),
-            (new StatusSensorReset($this->sensor, new SwitchOff(), $statusSensor)),
+            (new OffPress($this->sensor, new SwitchOff(), $this->group))->rules(),
+            (new StatusSensorReset($this->sensor, new SwitchOff(), $statusSensor))->rules(),
         );
     }
 

@@ -5,19 +5,14 @@ namespace Hue\Command;
 
 use Hue\Bridge;
 use Hue\Contract\CommandInterface;
-use Hue\Contract\ProgramInterface;
 use Hue\Contract\SensorInterface;
 use Hue\Repository\GroupRepository;
 use Hue\Repository\ProgramRepository;
 use Hue\Repository\ResourceLinksRepository;
 use Hue\Repository\RuleRepository;
 use Hue\Repository\SensorRepository;
-use Hue\SensorProgram\ZLLSwitch;
-use Hue\SensorProgram\SmartButton;
-use Hue\SensorProgram\ZLLPresence;
 use InvalidArgumentException;
 use function array_key_exists;
-use function class_exists;
 use function fgets;
 use function in_array;
 use const STDIN;
@@ -104,12 +99,16 @@ final class ProgramSensor implements CommandInterface
         $this->deleteOldRules($sensor);
         $ruleRepo = new RuleRepository($this->bridge->api());
         foreach ($rules as $rule) {
+            echo "Creating rule {$rule->name()}\n";
             $resourceLinks[] = $ruleRepo->create($rule->name(), $rule->conditions(), $rule->actions());
-            echo "Created rule {$rule->name()}\n";
         }
 
-        $resourceLinksRepo = new ResourceLinksRepository($this->bridge->api());
-        $newResourceLinks = $resourceLinksRepo->create("{$sensor->name()}", 'Sensor program', 1, $resourceLinks);
+        $newResourceLinks = (new ResourceLinksRepository($this->bridge->api()))->create(
+            $sensor->name(),
+            'Sensor program',
+            1,
+            $resourceLinks
+        );
         echo "Resource links created: {$newResourceLinks->id()}\n";
         foreach ($resourceLinks as $link) {
             echo "With resource link {$link->name()}: {$link->apiUrl()}\n";
@@ -131,8 +130,11 @@ final class ProgramSensor implements CommandInterface
         // Remove resource links
         foreach ($resourceLinkRepo->all() as $resourceLinks) {
             if ($resourceLinks->name() === $sensor->name()) {
-                $resourceLinkRepo->delete($resourceLinks->id());
-                echo "Deleted resource links: {$resourceLinks->id()} ({$resourceLinks->name()})\n";
+                if ($resourceLinkRepo->delete($resourceLinks->id())->success()) {
+                    echo "Deleted resource links: {$resourceLinks->id()} ({$resourceLinks->name()})\n";
+                } else {
+                    echo "Resource links deletion FAILED: {$resourceLinks->id()} ({$resourceLinks->name()})\n";
+                }
             }
         }
 
@@ -144,8 +146,11 @@ final class ProgramSensor implements CommandInterface
                     "/sensors/{$sensor->id()}/state/buttonevent",
                     "/sensors/{$sensor->id()}/state/presence",
                 ])) {
-                    $ruleRepo->delete($rule->id());
-                    echo "Deleted rule: {$rule->id()} ({$rule->name()})\n";
+                    if ($ruleRepo->delete($rule->id())->success()) {
+                        echo "Deleted rule: {$rule->id()} ({$rule->name()})\n";
+                    } else {
+                        echo "Rule deletion FAILED: {$rule->id()} ({$rule->name()})\n";
+                    }
 
                     continue 2;
                 }
